@@ -1,0 +1,21 @@
+name: custom_code_analysis
+description: custom code analysis rules
+version: 0.0.6
+homepage:
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  analyzer: ^0.39.17
+  analyzer_plugin: ^0.3.0
+  quick_log: ^4.0.1
+  path: ^1.8.0
+  uuid: ^2.2.2
+  glob: ^1.1.7
+  source_span: ^1.4.1
+  pub_semver: ^1.4.4
+  yaml: ^2.2.1
+
+dev_dependencies:
+  test: any
