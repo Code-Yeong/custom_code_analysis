@@ -19,4 +19,7 @@
 - release 
 
 ## 0.0.7
-- upgrade dependencies 
+- upgrade dependencies
+ 
+## 0.0.8
+- bug fix  

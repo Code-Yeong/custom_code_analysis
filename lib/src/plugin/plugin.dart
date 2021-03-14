@@ -38,7 +38,7 @@ class TestPlugin extends ServerPlugin {
   String get name => 'Test Plugin';
 
   @override
-  String get version => '0.0.7';
+  String get version => '0.0.8';
 
   @override
   bool isCompatibleWith(Version serverVersion) => true;

@@ -2,7 +2,7 @@
 1.Add dependency to `pubspec.yaml`
 ```
 dependencies:
-  custom_code_analysis: ^0.0.7
+  custom_code_analysis: ^0.0.8
 ```
 2.Add configuration to `analysis_options.yaml`
 ```
@@ -14,7 +14,7 @@ custom_code_analysis:
   exclude:
       - "test/**"
   rules:
-    - clickable-widget-id-missing
+    - clickable-widget-uuid-missing
     - avoid-using-show-bottom-modal-sheet
     - avoid-using-show-bottom-sheet
     - avoid-using-show-date-picker

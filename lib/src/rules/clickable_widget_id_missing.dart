@@ -134,10 +134,10 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
     super.visitArgumentList(node);
 
     if (node.parent.childEntities.isNotEmpty) {
-      if (node.parent.childEntities.toString().contains(ClickableWidgetIdMissing.className)) {
+      if (node.parent.beginToken.lexeme == ClickableWidgetIdMissing.className) {
         bool _isNeedFix = true;
         for (final item in node.arguments) {
-          if (item.toString().contains(ClickableWidgetIdMissing.requiredField)) {
+          if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
             _isNeedFix = false;
             break;
           }

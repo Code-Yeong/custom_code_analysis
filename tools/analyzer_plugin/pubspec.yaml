@@ -5,4 +5,4 @@ environment:
   sdk: '>=2.7.0 <3.0.0'
 
 dependencies:
-  custom_code_analysis: ^0.0.7
+  custom_code_analysis: ^0.0.8
