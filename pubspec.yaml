@@ -7,11 +7,11 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  analyzer: ^0.39.17
-  analyzer_plugin: ^0.3.0
+  analyzer: ^0.41.1
+  analyzer_plugin: ^0.4.0
   quick_log: ^4.0.1
   path: ^1.8.0
-  uuid: ^2.2.2
+  uuid: ^3.0.1
   glob: ^1.1.7
   source_span: ^1.4.1
   pub_semver: ^1.4.4
