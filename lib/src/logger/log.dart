@@ -90,6 +90,5 @@ class EmtpyLogger {
   }
 }
 
-// var logUtil =
-//     QLogger.createOutputToFile('plugin', filePath: getLogPath()); // 开始log
-var logUtil = EmtpyLogger(); // 关闭log
+var logUtil = QLogger.createOutputToFile('plugin', filePath: getLogPath()); // 开始log
+// var logUtil = EmtpyLogger(); // 关闭log

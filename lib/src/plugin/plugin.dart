@@ -35,10 +35,10 @@ class TestPlugin extends ServerPlugin {
   List<String> get fileGlobsToAnalyze => <String>['**/*.dart'];
 
   @override
-  String get name => 'Test Plugin';
+  String get name => 'Custom Code Analysis';
 
   @override
-  String get version => '0.0.8';
+  String get version => '0.0.9';
 
   @override
   bool isCompatibleWith(Version serverVersion) => true;

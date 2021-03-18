@@ -1,0 +1,9 @@
+analyzer:
+  plugins:
+    - custom_code_analysis
+
+custom_code_analysis:
+  exclude:
+    - "test/**"
+  rules:
+    - clickable-widget-uuid-missing

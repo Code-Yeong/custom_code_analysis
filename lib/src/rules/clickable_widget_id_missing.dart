@@ -124,19 +124,37 @@ class ClickableWidgetIdMissing extends Rule {
   }
 }
 
+final _annotatedClass = <String>[ClickableWidgetIdMissing.className];
+
 class _MirrorVisitor extends RecursiveAstVisitor<void> {
   final _nodes = <ArgumentList>[];
 
   Iterable<ArgumentList> get nodes => _nodes;
 
   @override
+  void visitAnnotation(Annotation node) {
+    super.visitAnnotation(node);
+    if (node.name.name == 'Clickable') {
+      if (node.arguments.arguments.isNotEmpty) {
+        if (node.arguments.arguments.beginToken.lexeme == 'name') {
+          if (!_annotatedClass.contains(node.arguments.arguments.endToken.lexeme)) {
+            _annotatedClass.add(node.arguments.arguments.endToken.lexeme);
+          }
+        }
+      }
+    }
+  }
+
+  @override
   void visitArgumentList(ArgumentList node) {
     super.visitArgumentList(node);
-
+    // logUtil.info('name = $_annotatedClass');
     if (node.parent.childEntities.isNotEmpty) {
-      if (node.parent.beginToken.lexeme == ClickableWidgetIdMissing.className) {
+      // if (node.parent.beginToken.lexeme == ClickableWidgetIdMissing.className) {
+      if (_annotatedClass.contains(node.parent.beginToken.lexeme)) {
         bool _isNeedFix = true;
         for (final item in node.arguments) {
+          // logUtil.info('name = ${item.beginToken.lexeme}, requesn = ${ClickableWidgetIdMissing.requiredField}');
           if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
             _isNeedFix = false;
             break;

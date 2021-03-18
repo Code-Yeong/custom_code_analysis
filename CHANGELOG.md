@@ -22,4 +22,7 @@
 - upgrade dependencies
  
 ## 0.0.8
-- bug fix  
+- bug fix
+
+## 0.0.9-dev
+- scan annotations    
