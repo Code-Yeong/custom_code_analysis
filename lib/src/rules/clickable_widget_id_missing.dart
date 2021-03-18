@@ -127,10 +127,10 @@ class ClickableWidgetIdMissing extends Rule {
 final _annotatedClass = <String>[
   ClickableWidgetIdMissing.className,
   'RoundButton',
-  'CircleButton'
-  'AvatarPlayButton'
-  'TEButton'
-  'PlayButton'
+  'CircleButton',
+  'AvatarPlayButton',
+  'TEButton',
+  'PlayButton',
 ];
 
 class _MirrorVisitor extends RecursiveAstVisitor<void> {
