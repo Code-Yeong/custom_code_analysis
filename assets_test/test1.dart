@@ -3,13 +3,11 @@ class ClickableWidget {}
 class ViewModle {
   void log() {
     print("objectssd");
-    ClickableWidget();
-    RoundButton();
+    RoundButton.circle();
   }
 }
 
-
-class Clickable{
+class Clickable {
   final String name;
 
   const Clickable({this.name});
@@ -17,5 +15,9 @@ class Clickable{
 
 @Clickable(name: 'RoundButton')
 class RoundButton {
+  RoundButton();
 
+  factory RoundButton.circle() {
+    return RoundButton();
+  }
 }
