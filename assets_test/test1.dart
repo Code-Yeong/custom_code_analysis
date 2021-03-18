@@ -2,7 +2,7 @@ class ClickableWidget {}
 
 class ViewModle {
   void log() {
-    print("object");
+    print("objectssd");
     ClickableWidget();
     RoundButton();
   }
@@ -11,8 +11,11 @@ class ViewModle {
 
 class Clickable{
   final String name;
+
   const Clickable({this.name});
 }
 
 @Clickable(name: 'RoundButton')
-class RoundButton {}
+class RoundButton {
+
+}

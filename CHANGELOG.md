@@ -25,4 +25,7 @@
 - bug fix
 
 ## 0.0.9-dev
-- scan annotations    
+- scan annotations
+
+## 0.0.9+1-dev
+- fix bugs        

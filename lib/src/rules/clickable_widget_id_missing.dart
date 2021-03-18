@@ -124,26 +124,26 @@ class ClickableWidgetIdMissing extends Rule {
   }
 }
 
-final _annotatedClass = <String>[ClickableWidgetIdMissing.className];
+final _annotatedClass = <String>[ClickableWidgetIdMissing.className, 'RoundButton'];
 
 class _MirrorVisitor extends RecursiveAstVisitor<void> {
   final _nodes = <ArgumentList>[];
 
   Iterable<ArgumentList> get nodes => _nodes;
 
-  @override
-  void visitAnnotation(Annotation node) {
-    super.visitAnnotation(node);
-    if (node.name.name == 'Clickable') {
-      if (node.arguments.arguments.isNotEmpty) {
-        if (node.arguments.arguments.beginToken.lexeme == 'name') {
-          if (!_annotatedClass.contains(node.arguments.arguments.endToken.lexeme)) {
-            _annotatedClass.add(node.arguments.arguments.endToken.lexeme);
-          }
-        }
-      }
-    }
-  }
+  // @override
+  // void visitAnnotation(Annotation node) {
+  //   super.visitAnnotation(node);
+  //   if (node.name.name == 'Clickable') {
+  //     if (node.arguments.arguments.isNotEmpty) {
+  //       if (node.arguments.arguments.beginToken.lexeme == 'name') {
+  //         if (!_annotatedClass.contains(node.arguments.arguments.endToken.lexeme)) {
+  //           _annotatedClass.add(node.arguments.arguments.endToken.lexeme);
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   @override
   void visitArgumentList(ArgumentList node) {
