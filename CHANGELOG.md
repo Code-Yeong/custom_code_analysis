@@ -37,4 +37,7 @@
 - fix bugs 
 
 ## 0.0.9+4-dev
-- support `@Clickable`        
+- support `@Clickable`
+
+## 0.0.9
+- bug fix        
