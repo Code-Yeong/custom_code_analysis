@@ -1,13 +1,14 @@
+var a = ClickableWidget();
+class ViewModel {
+  void log() {
+
+    RoundButton.circle(name: '12312', uuid: 'abcde');
+  }
+}
+
 class ClickableWidget {
   final String uuid;
   ClickableWidget({this.uuid});
-}
-
-class ViewModel {
-  void log() {
-    ClickableWidget();
-    RoundButton.circle(name: '12312', uuid: 'abcde');
-  }
 }
 
 class Clickable {

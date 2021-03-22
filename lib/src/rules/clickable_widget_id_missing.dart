@@ -31,19 +31,25 @@ class ClickableWidgetIdMissing extends Rule {
     return _compilationUnit.lineInfo.getLocation(token.offset).lineNumber;
   }
 
-  String _generateReplacement(ArgumentList node) {
+  String get _code => Uuid().v4().toString().replaceAll('-', '');
+
+  String _generateReplacement(InstanceCreationExpression node) {
     // return 'example........str';
-    int left = _getLineNumber(node.leftParenthesis);
-    int right = _getLineNumber(node.rightParenthesis);
+    int left = _getLineNumber(node.argumentList.leftParenthesis);
+    int right = _getLineNumber(node.argumentList.rightParenthesis);
+    // logUtil.info('node = ,left = $left, ${node.argumentList.leftParenthesis.offset}, ${node}');
+    // return '';
     String result;
     String _randomId = Uuid().v4().toString().replaceAll('-', '');
-
     String content = analysisResult.content;
     if (left == right) {
-      result = '${content.substring(node.offset, node.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.offset + 1, node.end)}';
+      result =
+          '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.leftParenthesis.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
     } else {
-      result = '${content.substring(node.offset, node.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.offset + 1, node.end)}';
+      result =
+          '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
     }
+    // logUtil.info('result = $result');
     return result;
   }
 
@@ -66,11 +72,11 @@ class ClickableWidgetIdMissing extends Rule {
               _compilationUnit.lineInfo.getLocation(node.offset).columnNumber,
             ),
             _message,
-            'code',
+            _code,
             correction: _correction,
             hasFix: true,
           ),
-          replacement: _generateReplacement(node.argumentList),
+          replacement: _generateReplacement(node),
           fixes: codeIssueToAnalysisErrorFixes2(
             ErrorIssue(
               error: plugin.AnalysisError(
@@ -84,11 +90,11 @@ class ClickableWidgetIdMissing extends Rule {
                   _compilationUnit.lineInfo.getLocation(node.offset).columnNumber,
                 ),
                 _message,
-                'code',
+                _code,
                 correction: _correction,
                 hasFix: true,
               ),
-              replacement: _generateReplacement(node.argumentList),
+              replacement: _generateReplacement(node),
             ),
             analysisResult,
           ),
@@ -127,44 +133,6 @@ class ClickableWidgetIdMissing extends Rule {
     );
   }
 }
-
-// final _annotatedClass = <String>[
-//   ClickableWidgetIdMissing.className,
-//   'RoundButton',
-//   'CircleButton',
-//   'AvatarPlayButton',
-//   'TEButton',
-//   'PlayButton',
-// ];
-
-// class _MirrorVisitor extends RecursiveAstVisitor<void> {
-//   final _nodes = <ArgumentList>[];
-//
-//   Iterable<ArgumentList> get nodes => _nodes;
-//
-//   @override
-//   void visitArgumentList(ArgumentList node) {
-//     super.visitArgumentList(node);
-//     // node.parent.beginToken.isTopLevelKeyword
-//     // logUtil.info('name = $_annotatedClass');
-//     if (node.parent.childEntities.isNotEmpty) {
-//       // if (node.parent.beginToken.lexeme == ClickableWidgetIdMissing.className) {
-//       if (_annotatedClass.contains(node.parent.beginToken.lexeme)) {
-//         bool _isNeedFix = true;
-//         for (final item in node.arguments) {
-//           // logUtil.info('name = ${item.beginToken.lexeme}, requesn = ${ClickableWidgetIdMissing.requiredField}');
-//           if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
-//             _isNeedFix = false;
-//             break;
-//           }
-//         }
-//         if (_isNeedFix) {
-//           _nodes.add(node);
-//         }
-//       }
-//     }
-//   }
-// }
 
 class _ParameterVisitor extends GeneralizingAstVisitor<void> {
   final _nodes = <InstanceCreationExpression>[];
