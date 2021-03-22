@@ -1,8 +1,8 @@
 name: custom_code_analysis_bootstrap
-version: 0.0.9+3-dev
+version: 0.0.9+4-dev
 
 environment:
   sdk: '>=2.7.0 <3.0.0'
 
 dependencies:
-  custom_code_analysis: ^0.0.9+3-dev
+  custom_code_analysis: ^0.0.9+4-dev

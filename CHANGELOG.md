@@ -34,4 +34,7 @@
 - fix bugs
 
 ## 0.0.9+3-dev
-- fix bugs        
+- fix bugs 
+
+## 0.0.9+4-dev
+- support `@Clickable`        

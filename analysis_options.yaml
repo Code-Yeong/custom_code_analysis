@@ -4,6 +4,6 @@ analyzer:
 
 custom_code_analysis:
   exclude:
-    - "test/**"
+#    - "test/**"
   rules:
     - clickable-widget-uuid-missing

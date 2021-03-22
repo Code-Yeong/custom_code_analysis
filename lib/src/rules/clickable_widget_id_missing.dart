@@ -16,6 +16,7 @@ class ClickableWidgetIdMissing extends Rule {
 
   static const ruleId = 'clickable-widget-uuid-missing';
   static const _comment = '快速添加';
+  static const annotation = 'Clickable';
   static const className = 'ClickableWidget';
   static const requiredField = 'uuid';
   static const _message = '$className缺少$requiredField参数';
@@ -31,6 +32,7 @@ class ClickableWidgetIdMissing extends Rule {
   }
 
   String _generateReplacement(ArgumentList node) {
+    // return 'example........str';
     int left = _getLineNumber(node.leftParenthesis);
     int right = _getLineNumber(node.rightParenthesis);
     String result;
@@ -46,7 +48,8 @@ class ClickableWidgetIdMissing extends Rule {
   }
 
   List<ErrorIssue> errors() {
-    final visitor = _MirrorVisitor();
+    // final visitor = _MirrorVisitor();
+    final visitor = _ParameterVisitor();
     _compilationUnit.accept(visitor);
     return visitor.nodes.map(
       (node) {
@@ -67,7 +70,7 @@ class ClickableWidgetIdMissing extends Rule {
             correction: _correction,
             hasFix: true,
           ),
-          replacement: _generateReplacement(node),
+          replacement: _generateReplacement(node.argumentList),
           fixes: codeIssueToAnalysisErrorFixes2(
             ErrorIssue(
               error: plugin.AnalysisError(
@@ -85,7 +88,7 @@ class ClickableWidgetIdMissing extends Rule {
                 correction: _correction,
                 hasFix: true,
               ),
-              replacement: _generateReplacement(node),
+              replacement: _generateReplacement(node.argumentList),
             ),
             analysisResult,
           ),
@@ -95,6 +98,7 @@ class ClickableWidgetIdMissing extends Rule {
   }
 
   plugin.AnalysisErrorFixes codeIssueToAnalysisErrorFixes2(ErrorIssue error, ResolvedUnitResult unitResult) {
+    // return null;
     return plugin.AnalysisErrorFixes(
       error.error,
       fixes: [
@@ -124,53 +128,75 @@ class ClickableWidgetIdMissing extends Rule {
   }
 }
 
-final _annotatedClass = <String>[
-  ClickableWidgetIdMissing.className,
-  'RoundButton',
-  'CircleButton',
-  'AvatarPlayButton',
-  'TEButton',
-  'PlayButton',
-];
+// final _annotatedClass = <String>[
+//   ClickableWidgetIdMissing.className,
+//   'RoundButton',
+//   'CircleButton',
+//   'AvatarPlayButton',
+//   'TEButton',
+//   'PlayButton',
+// ];
 
-class _MirrorVisitor extends RecursiveAstVisitor<void> {
-  final _nodes = <ArgumentList>[];
+// class _MirrorVisitor extends RecursiveAstVisitor<void> {
+//   final _nodes = <ArgumentList>[];
+//
+//   Iterable<ArgumentList> get nodes => _nodes;
+//
+//   @override
+//   void visitArgumentList(ArgumentList node) {
+//     super.visitArgumentList(node);
+//     // node.parent.beginToken.isTopLevelKeyword
+//     // logUtil.info('name = $_annotatedClass');
+//     if (node.parent.childEntities.isNotEmpty) {
+//       // if (node.parent.beginToken.lexeme == ClickableWidgetIdMissing.className) {
+//       if (_annotatedClass.contains(node.parent.beginToken.lexeme)) {
+//         bool _isNeedFix = true;
+//         for (final item in node.arguments) {
+//           // logUtil.info('name = ${item.beginToken.lexeme}, requesn = ${ClickableWidgetIdMissing.requiredField}');
+//           if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
+//             _isNeedFix = false;
+//             break;
+//           }
+//         }
+//         if (_isNeedFix) {
+//           _nodes.add(node);
+//         }
+//       }
+//     }
+//   }
+// }
 
-  Iterable<ArgumentList> get nodes => _nodes;
+class _ParameterVisitor extends GeneralizingAstVisitor<void> {
+  final _nodes = <InstanceCreationExpression>[];
 
-  // @override
-  // void visitAnnotation(Annotation node) {
-  //   super.visitAnnotation(node);
-  //   if (node.name.name == 'Clickable') {
-  //     if (node.arguments.arguments.isNotEmpty) {
-  //       if (node.arguments.arguments.beginToken.lexeme == 'name') {
-  //         if (!_annotatedClass.contains(node.arguments.arguments.endToken.lexeme)) {
-  //           _annotatedClass.add(node.arguments.arguments.endToken.lexeme);
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+  Iterable<InstanceCreationExpression> get nodes => _nodes;
 
   @override
-  void visitArgumentList(ArgumentList node) {
-    super.visitArgumentList(node);
-    // logUtil.info('name = $_annotatedClass');
-    if (node.parent.childEntities.isNotEmpty) {
-      // if (node.parent.beginToken.lexeme == ClickableWidgetIdMissing.className) {
-      if (_annotatedClass.contains(node.parent.beginToken.lexeme)) {
-        bool _isNeedFix = true;
-        for (final item in node.arguments) {
-          // logUtil.info('name = ${item.beginToken.lexeme}, requesn = ${ClickableWidgetIdMissing.requiredField}');
-          if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
-            _isNeedFix = false;
-            break;
-          }
-        }
-        if (_isNeedFix) {
-          _nodes.add(node);
-        }
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    var _metaData = node.staticType.element.metadata;
+    bool _isTargetAnnotation = false;
+    for (final item in _metaData) {
+      if (item?.computeConstantValue()?.type?.getDisplayString(withNullability: false) == ClickableWidgetIdMissing.annotation) {
+        _isTargetAnnotation = true;
+        break;
       }
     }
+    if (node.constructorName.type?.name?.name == ClickableWidgetIdMissing.className) {
+      _isTargetAnnotation = true;
+    }
+    if (_isTargetAnnotation) {
+      var argumentList = node.argumentList.arguments;
+      bool _isNeedFix = true;
+      for (final item in argumentList) {
+        if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
+          _isNeedFix = false;
+          break;
+        }
+      }
+      if (_isNeedFix) {
+        _nodes.add(node);
+      }
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }

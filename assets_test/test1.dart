@@ -1,23 +1,29 @@
-class ClickableWidget {}
+class ClickableWidget {
+  final String uuid;
+  ClickableWidget({this.uuid});
+}
 
-class ViewModle {
+class ViewModel {
   void log() {
-    print("objectssd");
-    RoundButton.circle();
+    ClickableWidget();
+    RoundButton.circle(name: '12312', uuid: 'abcde');
   }
 }
 
 class Clickable {
-  final String name;
+  final String message;
 
-  const Clickable({this.name});
+  const Clickable({this.message});
 }
 
-@Clickable(name: 'RoundButton')
+@Clickable()
 class RoundButton {
-  RoundButton();
+  RoundButton({this.name, this.uuid});
 
-  factory RoundButton.circle() {
-    return RoundButton();
+  final String name;
+  final String uuid;
+
+  factory RoundButton.circle({String uuid, String name}) {
+    return RoundButton(uuid: uuid);
   }
 }
