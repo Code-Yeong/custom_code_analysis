@@ -92,7 +92,6 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     node.visitChildren(this);
-    // logUtil.info('lineNumber = ${lineNumber}, ignored = ${_ignores.isSuppressedAt(AvoidUsingShowBottomModalSheet.ruleId, lineNumber)}');
     if (node.methodName.name.contains(AvoidUsingShowBottomModalSheet.methodName)) {
       int lineNumber = _compilationUnit.lineInfo.getLocation(node.offset).lineNumber;
       if (!_ignores.isSuppressedAt(AvoidUsingShowBottomModalSheet.ruleId, lineNumber)) {

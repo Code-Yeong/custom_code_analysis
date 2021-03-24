@@ -14,6 +14,8 @@ class ClickableWidgetIdMissing extends Rule {
   final ResolvedUnitResult analysisResult;
   String unitPath;
 
+  final String debugContent;
+
   static const ruleId = 'clickable-widget-uuid-missing';
   static const _comment = '快速添加';
   static const annotation = 'Clickable';
@@ -22,33 +24,57 @@ class ClickableWidgetIdMissing extends Rule {
   static const _message = '$className缺少$requiredField参数';
   static const _correction = '$requiredField为$className必备参数，点击"$_comment"一键修复';
 
-  ClickableWidgetIdMissing(this._compilationUnit, this.analysisResult) {
+  ClickableWidgetIdMissing(this._compilationUnit, this.analysisResult, {this.debugContent}) {
     unitPath = this._compilationUnit.declaredElement.source.fullName;
     logUtil.info("checker $unitPath");
   }
 
-  int _getLineNumber(Token token) {
-    return _compilationUnit.lineInfo.getLocation(token.offset).lineNumber;
-  }
+  // int _getLineNumber(Token token) {
+  //   return _compilationUnit.lineInfo.getLocation(token.offset).lineNumber;
+  // }
 
   String get _code => Uuid().v4().toString().replaceAll('-', '');
 
   String _generateReplacement(InstanceCreationExpression node) {
-    // return 'example........str';
-    int left = _getLineNumber(node.argumentList.leftParenthesis);
-    int right = _getLineNumber(node.argumentList.rightParenthesis);
+    List<Expression> expressionList = [];
+    var argumentList = node.argumentList.arguments;
+    for (final item in argumentList) {
+      if (item.beginToken.lexeme.endsWith('uuid') && item.endToken.lexeme?.length != 34) {
+        expressionList.add(item);
+      }
+    }
+    // String content = analysisResult?.content ?? debugContent;
+
+    String _originSource = node.argumentList.toString();
+    for (final obj in expressionList) {
+      String _p1 = '${obj.beginToken.lexeme}: ${obj.endToken.lexeme}';
+      String _p2 = '${obj.beginToken.lexeme}:${obj.endToken.lexeme}';
+      String _randomId = Uuid().v4().toString().replaceAll('-', '');
+      String _replaceStr = '${obj.beginToken.lexeme}: \'$_randomId\'';
+      if (_originSource.contains(_p1)) {
+        _originSource = _originSource.replaceAll(_p1, _replaceStr);
+      } else if (_originSource.contains(_p2)) {
+        _originSource = _originSource.replaceAll(_p2, _replaceStr);
+      }
+    }
+
+    String result = '${node.constructorName}$_originSource';
+
+    // return content;
+
+    // int left = _getLineNumber(node.argumentList.leftParenthesis);
+    // int right = _getLineNumber(node.argumentList.rightParenthesis);
     // logUtil.info('node = ,left = $left, ${node.argumentList.leftParenthesis.offset}, ${node}');
     // return '';
-    String result;
-    String _randomId = Uuid().v4().toString().replaceAll('-', '');
-    String content = analysisResult.content;
-    if (left == right) {
-      result =
-          '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.leftParenthesis.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
-    } else {
-      result =
-          '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
-    }
+    // String result;
+
+    // if (left == right) {
+    //   result =
+    //       '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.leftParenthesis.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
+    // } else {
+    //   result =
+    //       '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
+    // }
     // logUtil.info('result = $result');
     return result;
   }
@@ -154,11 +180,17 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
     }
     if (_isTargetAnnotation) {
       var argumentList = node.argumentList.arguments;
-      bool _isNeedFix = true;
+      // bool _isNeedFix = true;
+      bool _isNeedFix = false;
       for (final item in argumentList) {
-        if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
-          _isNeedFix = false;
-          break;
+        // logUtil.info(
+        //     'class = ${node.constructorName.type.name.name}: ${item}-  ${node.offset} - ${item.beginToken.lexeme} --: ${item.beginToken.lexeme.endsWith('uuid')}: ${item.endToken.lexeme}, ${item.endToken.lexeme?.length != 34}');
+        // if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
+        //   _isNeedFix = false;
+        //   break;
+        // }
+        if (item.beginToken.lexeme.endsWith('uuid') && item.endToken.lexeme?.length != 34) {
+          _isNeedFix = true;
         }
       }
       if (_isNeedFix) {

@@ -40,4 +40,10 @@
 - support `@Clickable`
 
 ## 0.0.9
-- bug fix        
+- bug fix
+
+## 0.0.10
+- bug fix
+
+## 0.0.10+1
+- new feature                   

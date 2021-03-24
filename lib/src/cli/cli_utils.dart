@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
+import 'package:analyzer/dart/ast/precedence.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
+import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/rules/clickable_widget_id_missing.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart';
@@ -34,7 +36,8 @@ Future<List<AnalysisError>> collectAnalyzerErrors(AnalysisContextCollection anal
   for (final filePath in paths) {
     final normalizedPath = normalize(filePath);
     final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    final issuesInFile = ClickableWidgetIdMissing(unit.unit, null);
+    // logUtil.info('${unit.content}');
+    final issuesInFile = ClickableWidgetIdMissing(unit.unit, null, debugContent: unit.content);
     // analysisErrors.addAll(issuesInFile
     //     .map((issue) => analysisErrorFor(filePath, issue, unit.unit)));
     analysisErrors.addAll(issuesInFile.errors().map((e) => e.error).toList());

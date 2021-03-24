@@ -81,10 +81,10 @@ packages:
   custom_code_analysis:
     dependency: "direct main"
     description:
-      path: "/Users/chivan/Documents/project/custom_code_analysis/"
+      path: "/Users/chivan/Documents/project/custom_code_analysis"
       relative: false
     source: path
-    version: "0.0.9"
+    version: "0.0.10+1"
   dart_style:
     dependency: transitive
     description:
