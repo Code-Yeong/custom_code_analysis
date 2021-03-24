@@ -84,7 +84,7 @@ packages:
       path: "/Users/chivan/Documents/project/custom_code_analysis"
       relative: false
     source: path
-    version: "0.0.10+1"
+    version: "0.0.10+2"
   dart_style:
     dependency: transitive
     description:

@@ -45,7 +45,12 @@ class ClickableWidgetIdMissing extends Rule {
     }
     // String content = analysisResult?.content ?? debugContent;
 
-    String _originSource = node.argumentList.toString();
+    String content = analysisResult?.content ?? debugContent;
+
+    // String _originSource = node.argumentList.toString();
+    String _originSource = content.substring(node.argumentList.offset, node.argumentList.end);
+
+    // String _originSource = node.argumentList.toString();
     for (final obj in expressionList) {
       String _p1 = '${obj.beginToken.lexeme}: ${obj.endToken.lexeme}';
       String _p2 = '${obj.beginToken.lexeme}:${obj.endToken.lexeme}';
@@ -189,7 +194,12 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
         //   _isNeedFix = false;
         //   break;
         // }
-        if (item.beginToken.lexeme.endsWith('uuid') && item.endToken.lexeme?.length != 34) {
+        if (item.beginToken.lexeme.endsWith('uuid') &&
+            (item.endToken.lexeme == null ||
+                item.endToken.lexeme == 'null' ||
+                item.endToken.lexeme.replaceAll('\'', '') == '' ||
+                item.endToken.lexeme.replaceAll('\'', '') == ' ' ||
+                item.endToken.lexeme.isEmpty)) {
           _isNeedFix = true;
         }
       }

@@ -46,4 +46,7 @@
 - bug fix
 
 ## 0.0.10+1
-- new feature                   
+- new feature
+
+## 0.0.10+2
+- bug fix                   
