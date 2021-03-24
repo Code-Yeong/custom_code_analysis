@@ -39,7 +39,12 @@ class ClickableWidgetIdMissing extends Rule {
     List<Expression> expressionList = [];
     var argumentList = node.argumentList.arguments;
     for (final item in argumentList) {
-      if (item.beginToken.lexeme.endsWith('uuid') && item.endToken.lexeme?.length != 34) {
+      if ((item.beginToken.lexeme.endsWith('uuid') || item.beginToken.lexeme.endsWith('Uuid')) &&
+          (item.endToken.lexeme == null ||
+              item.endToken.lexeme == 'null' ||
+              item.endToken.lexeme.replaceAll('\'', '') == '' ||
+              item.endToken.lexeme.replaceAll('\'', '') == ' ' ||
+              item.endToken.lexeme.isEmpty)) {
         expressionList.add(item);
       }
     }
@@ -194,7 +199,7 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
         //   _isNeedFix = false;
         //   break;
         // }
-        if (item.beginToken.lexeme.endsWith('uuid') &&
+        if ((item.beginToken.lexeme.endsWith('uuid') || item.beginToken.lexeme.endsWith('Uuid')) &&
             (item.endToken.lexeme == null ||
                 item.endToken.lexeme == 'null' ||
                 item.endToken.lexeme.replaceAll('\'', '') == '' ||
