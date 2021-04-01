@@ -10,6 +10,7 @@ void main() {
     final files = ['${Directory.current.path}/assets_test/test1.dart'];
     final analysisContextCollection = AnalysisContextCollection(
       includedPaths: files,
+      excludedPaths: [],
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final errors =

@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
+import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/precedence.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/logger/log.dart';
+import 'package:custom_code_analysis/src/model/error_issue.dart';
+import 'package:custom_code_analysis/src/rules/avoid_using_show_dialog.dart';
 import 'package:custom_code_analysis/src/rules/clickable_widget_id_missing.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart';
@@ -35,17 +38,50 @@ Future<List<AnalysisError>> collectAnalyzerErrors(AnalysisContextCollection anal
   final analysisErrors = <AnalysisError>[];
   for (final filePath in paths) {
     final normalizedPath = normalize(filePath);
-    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    // var stopWatch = Stopwatch();
+    // stopWatch.start();
+    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    // ParsedUnitResult parsedUnit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getParsedUnit(normalizedPath);
+    // stopWatch.stop();
+    // print('timeCost = ${stopWatch.elapsedMilliseconds}'); //timeCost = 2345 , 80
+    // parsedUnit.unit
+
     // logUtil.info('${unit.content}');
-    final issuesInFile = ClickableWidgetIdMissing(unit.unit, null, debugContent: unit.content);
-    // analysisErrors.addAll(issuesInFile
-    //     .map((issue) => analysisErrorFor(filePath, issue, unit.unit)));
-    analysisErrors.addAll(issuesInFile.errors().map((e) => e.error).toList());
+    // logUtil.info('unit.libraryElement.units = ${unit.libraryElement.importedLibraries.first.units}');
+    // logUtil.info('unit.libraryElement.units = ${unit.libraryElement.importedLibraries.first.units.first.getType('Clickable')}');
+    // var result = unit.libraryElement.importedLibraries.first.units.first.getType('Clickable');
+    // var result2 = unit.libraryElement.importedLibraries.first.units.first.getType('RoundButton');
+    // logUtil.info('result = ${result.fields}');
+    // logUtil.info('result2 = ${result2}');
+
+    // final issuesInFile = ClickableWidgetIdMissing(null, unit);
+
+    // test ignored
+    final rule = AvoidUsingShowDialog('avoid-using-show-dialog', unit);
+    analysisErrors.addAll(rule.check().map((e) => codeIssueToAnalysisError(e, unit)).toList());
   }
   return analysisErrors;
 }
 
 String readableAnalysisError(AnalysisError analysisError) => analysisError.toReadableString();
+
+AnalysisError codeIssueToAnalysisError(Issue issue, ResolvedUnitResult analysisResult) {
+  return AnalysisError(
+    issue.errorSeverity,
+    issue.errorType,
+    Location(
+      analysisResult.unit.declaredElement.source.fullName,
+      issue.offset,
+      issue.length,
+      issue.line,
+      issue.column,
+    ),
+    issue.message,
+    issue.code,
+    correction: issue.correction,
+    hasFix: issue.hasFix,
+  );
+}
 
 extension ReadableOutput on AnalysisError {
   String toReadableString() => '$severity - $type\n$message\n${location.file}:${location.startLine}:${location.startColumn}';

@@ -1,4 +1,6 @@
 import 'package:custom_code_analysis/src/logger/log.dart';
+import 'package:yaml/yaml.dart';
+import 'package:analyzer/src/util/yaml.dart';
 
 const String analysisOptionsFileName = 'analysis_options.yaml';
 
@@ -11,10 +13,10 @@ const _rulesKey = 'rules';
 // const _excludeKey = 'exclude';
 
 class AnalysisOptions {
-  static AnalysisOptions fromMap(Map<String, Object> map) {
+  static AnalysisOptions fromYamlMap(YamlMap yamlMap) {
     return AnalysisOptions(
-      rules: _readRules(map[_rootKey] ?? {}),
-      excludes: _readExcludes(map[_rootKey] ?? {}),
+      rules: getKey(yamlMap, _rulesKey).value,
+      excludes: getKey(yamlMap, _customExcludeKey).value,
     );
   }
 
@@ -22,25 +24,4 @@ class AnalysisOptions {
 
   final List<dynamic> excludes;
   final List<dynamic> rules;
-
-  static List<dynamic> _readExcludes(Map<String, Object> map) {
-    logUtil.info('_readExcludes ');
-    if (map == null) {
-      return [];
-    }
-    var result = List.from(map[_customExcludeKey] ?? []);
-    logUtil.info('_readExcludes = $result');
-    return result;
-  }
-
-  static List<dynamic> _readRules(Map<String, Object> map) {
-    logUtil.info('_readRules ');
-    if (map == null) {
-      return [];
-    }
-    List<String> ruleList = List.from(map[_rulesKey] ?? []);
-
-    logUtil.info('_readRules = $ruleList');
-    return ruleList;
-  }
 }

@@ -3,44 +3,49 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart' as plugin;
+import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
+import 'package:analyzer_plugin/protocol/protocol_generated.dart';
 import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:uuid/uuid.dart';
 
 class ClickableWidgetIdMissing extends Rule {
-  final CompilationUnit _compilationUnit;
-  final ResolvedUnitResult analysisResult;
-  String unitPath;
+  ClickableWidgetIdMissing(
+    String ruleId,
+    ResolvedUnitResult analysisResult,
+  ) : super(ruleId: ruleId, analysisResult: analysisResult);
 
-  final String debugContent;
+  @override
+  String get code => ruleId;
 
-  static const ruleId = 'clickable-widget-uuid-missing';
-  static const _comment = '快速添加';
+  @override
+  String get comment => '快速添加';
+
+  @override
+  String get correction => '$requiredField为$className必备参数，点击"$comment"一键修复';
+
+  @override
+  String get message => '$className缺少$requiredField参数';
+
+  @override
+  String get methodName => null;
+
   static const annotation = 'Clickable';
   static const className = 'ClickableWidget';
   static const requiredField = 'uuid';
-  static const _message = '$className缺少$requiredField参数';
-  static const _correction = '$requiredField为$className必备参数，点击"$_comment"一键修复';
-
-  ClickableWidgetIdMissing(this._compilationUnit, this.analysisResult, {this.debugContent}) {
-    unitPath = this._compilationUnit.declaredElement.source.fullName;
-    logUtil.info("checker $unitPath");
-  }
 
   int _getLineNumber(Token token) {
-    return _compilationUnit.lineInfo.getLocation(token.offset).lineNumber;
+    return analysisResult.unit.lineInfo.getLocation(token.offset).lineNumber;
   }
-
-  String get _code => Uuid().v4().toString().replaceAll('-', '');
 
   String _generateReplacement(InstanceCreationExpression node) {
     List<Expression> expressionList = [];
     var argumentList = node.argumentList.arguments;
 
     String result;
-    String content = analysisResult?.content ?? debugContent;
+    String content = analysisResult?.content;
     if (node.constructorName.type?.name?.name == ClickableWidgetIdMissing.className) {
       List<String> _list = argumentList.map((e) => e.beginToken.lexeme).toList();
       if (_list.every((element) => element != ClickableWidgetIdMissing.requiredField)) {
@@ -85,86 +90,29 @@ class ClickableWidgetIdMissing extends Rule {
       result = '${node.constructorName}$_originSource';
     }
 
-    // logUtil.info('result = $result');
     return result;
   }
 
-  List<ErrorIssue> errors() {
+  @override
+  List<Issue> check() {
     final visitor = _ParameterVisitor();
-    _compilationUnit.accept(visitor);
-    return visitor.nodes.map(
-      (node) {
-        return ErrorIssue(
-          error: plugin.AnalysisError(
-            plugin.AnalysisErrorSeverity.INFO,
-            plugin.AnalysisErrorType.HINT,
-            plugin.Location(
-              _compilationUnit.declaredElement.source.fullName,
-              node.offset,
-              node.length,
-              _compilationUnit.lineInfo.getLocation(node.offset).lineNumber,
-              _compilationUnit.lineInfo.getLocation(node.offset).columnNumber,
-            ),
-            _message,
-            _code,
-            correction: _correction,
-            hasFix: true,
-          ),
-          replacement: _generateReplacement(node),
-          fixes: codeIssueToAnalysisErrorFixes2(
-            ErrorIssue(
-              error: plugin.AnalysisError(
-                plugin.AnalysisErrorSeverity.INFO,
-                plugin.AnalysisErrorType.HINT,
-                plugin.Location(
-                  _compilationUnit.declaredElement.source.fullName,
-                  node.offset,
-                  node.length,
-                  _compilationUnit.lineInfo.getLocation(node.offset).lineNumber,
-                  _compilationUnit.lineInfo.getLocation(node.offset).columnNumber,
-                ),
-                _message,
-                _code,
-                correction: _correction,
-                hasFix: true,
-              ),
+    analysisResult.unit.accept(visitor);
+    return visitor.nodes
+        .map((node) => Issue(
+              errorSeverity: AnalysisErrorSeverity.INFO,
+              errorType: AnalysisErrorType.HINT,
+              offset: node.offset,
+              length: node.length,
+              line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
+              message: message,
+              code: code,
+              comment: comment,
+              correction: correction,
               replacement: _generateReplacement(node),
-            ),
-            analysisResult,
-          ),
-        );
-      },
-    ).toList();
-  }
-
-  plugin.AnalysisErrorFixes codeIssueToAnalysisErrorFixes2(ErrorIssue error, ResolvedUnitResult unitResult) {
-    // return null;
-    return plugin.AnalysisErrorFixes(
-      error.error,
-      fixes: [
-        if (error.error.correction != null)
-          plugin.PrioritizedSourceChange(
-            99,
-            plugin.SourceChange(
-              _comment,
-              edits: [
-                plugin.SourceFileEdit(
-                  unitResult.libraryElement.source.fullName,
-                  unitResult.libraryElement.source.modificationStamp,
-                  edits: [
-                    plugin.SourceEdit(
-                      error.error.location.offset,
-                      error.error.location.length,
-                      error.replacement,
-                    ),
-                  ],
-                ),
-              ],
-              // selection: Position(unitResult.libraryElement.source.fullName, issue.offset),
-            ),
-          ),
-      ],
-    );
+              hasFix: false,
+            ))
+        .toList();
   }
 }
 
