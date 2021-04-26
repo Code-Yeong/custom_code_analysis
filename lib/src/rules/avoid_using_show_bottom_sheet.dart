@@ -24,15 +24,7 @@ class AvoidUsingShowBottomSheet extends Rule {
     _ignores = Suppressions(analysisResult.content, _compilationUnit.lineInfo);
   }
 
-  //
-  // int _getLineNumber(Token token) {
-  //   return _compilationUnit.lineInfo.getLocation(token.offset).lineNumber;
-  // }
-  //
-  // int _getColumnNumber(Token token) {
-  //   return _compilationUnit.lineInfo.getLocation(token.offset).columnNumber;
-  // }
-
+  @override
   Iterable<ErrorIssue> errors() {
     final visitor = _MirrorVisitor(_compilationUnit, _ignores);
     _compilationUnit.accept(visitor);

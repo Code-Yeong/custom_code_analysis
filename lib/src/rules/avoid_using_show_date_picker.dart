@@ -24,6 +24,7 @@ class AvoidUsingShowDatePicker extends Rule {
     _ignores = Suppressions(analysisResult.content, _compilationUnit.lineInfo);
   }
 
+  @override
   Iterable<ErrorIssue> errors() {
     final visitor = _MirrorVisitor(_compilationUnit, _ignores);
     _compilationUnit.accept(visitor);

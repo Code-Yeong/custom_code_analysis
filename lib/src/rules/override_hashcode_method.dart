@@ -7,19 +7,19 @@ import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:custom_code_analysis/src/utils/ingores.dart';
 
-class AvoidUsingColors extends Rule {
+class OverrideHashcodeMethod extends Rule {
   final CompilationUnit _compilationUnit;
   final ResolvedUnitResult analysisResult;
   String unitPath;
   Suppressions _ignores;
-  static const ruleId = 'avoid-using-colors';
+  static const ruleId = 'override-hashCode-method';
   static const code = ruleId;
-  static const methodName = 'Colors';
-  static const comment = '快速添加';
-  static const message = '禁止使用原生$methodName类';
-  static const correction = '原生$methodName函数禁止调用';
+  static const methodName = 'hashCode';
+  static const comment = '快速修复';
+  static const message = '$methodName不全';
+  static const correction = '$methodName中要包含每个field';
 
-  AvoidUsingColors(this._compilationUnit, this.analysisResult) {
+  OverrideHashcodeMethod(this._compilationUnit, this.analysisResult) {
     unitPath = this._compilationUnit.declaredElement.source.fullName;
     _ignores = Suppressions(analysisResult.content, _compilationUnit.lineInfo);
   }
@@ -44,8 +44,9 @@ class AvoidUsingColors extends Rule {
             message,
             code,
             correction: correction,
-            hasFix: false,
+            hasFix: true,
           ),
+          replacement: generateReplacement(node),
         );
       },
     ).toList();
@@ -79,6 +80,23 @@ class AvoidUsingColors extends Rule {
       ],
     );
   }
+
+  String generateReplacement(ExpressionFunctionBody node) {
+    String fixStr = '';
+    var className = node.parent.parent.beginToken.next.lexeme;
+    var targetElement = _compilationUnit.declaredElement.library.getType(className);
+    if (targetElement.supertype.getDisplayString(withNullability: false) == 'ReduxViewModel') {
+      var fields = targetElement.unnamedConstructor.parameters;
+      for (final field in fields) {
+        String displayName = '${field.displayName}.hashCode';
+        fixStr = '$fixStr ^ $displayName';
+      }
+    }
+
+    fixStr = fixStr.replaceRange(0, 3, '');
+    // print('fixStr = $fixStr');
+    return fixStr;
+  }
 }
 
 class _MirrorVisitor extends RecursiveAstVisitor<void> {
@@ -91,13 +109,37 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
   Iterable<AstNode> get nodes => _nodes;
 
   @override
-  void visitMethodInvocation(MethodInvocation node) {
-    node.visitChildren(this);
-    // logUtil.info('lineNumber = ${lineNumber}, ignored = ${_ignores.isSuppressedAt(AvoidUsingColors.ruleId, lineNumber)}');
-    if (node.methodName.name.contains(AvoidUsingColors.methodName)) {
-      int lineNumber = _compilationUnit.lineInfo.getLocation(node.offset).lineNumber;
-      if (!_ignores.isSuppressedAt(AvoidUsingColors.ruleId, lineNumber)) {
-        _nodes.add(node);
+  void visitExpressionFunctionBody(ExpressionFunctionBody node) {
+    if (node.parent.beginToken.lexeme == '@') {
+      if (node.parent.beginToken.next.lexeme == 'override') {
+        if (node.parent.beginToken.next.next.lexeme == 'int') {
+          if (node.parent.beginToken.next.next.next.lexeme == 'get') {
+            if (node.parent.beginToken.next.next.next.next.lexeme == 'hashCode') {
+              bool _needFix = false;
+              var className = node.parent.parent.beginToken.next.lexeme;
+              var targetElement = _compilationUnit.declaredElement.library.getType(className);
+              if (targetElement.supertype.getDisplayString(withNullability: false) == 'ReduxViewModel') {
+                var fields = targetElement.unnamedConstructor.parameters;
+                String hashString = node.expression.toString();
+                // print('hashString = $hashString');
+                for (final field in fields) {
+                  String displayName = '${field.displayName}.hashCode';
+                  // print('testName: $displayName');
+                  if (!hashString.contains(displayName)) {
+                    _needFix = true;
+                    break;
+                  }
+                }
+              }
+              if (_needFix) {
+                int lineNumber = _compilationUnit.lineInfo.getLocation(node.offset).lineNumber;
+                if (!_ignores.isSuppressedAt(OverrideHashcodeMethod.ruleId, lineNumber)) {
+                  _nodes.add(node);
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

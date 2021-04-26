@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
-import 'package:custom_code_analysis/src/rules/clickable_widget_id_missing.dart';
+import 'package:custom_code_analysis/src/configs/rule_config.dart';
+import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart';
 import 'package:yaml/yaml.dart';
@@ -29,14 +30,13 @@ List<String> resolvePaths(List<String> paths, List<String> excludedFolders) {
 
 bool _isExcluded(String filePath, Iterable<Glob> excludes) => excludes.any((exclude) => exclude.matches(filePath));
 
-Future<List<AnalysisError>> collectAnalyzerErrors(AnalysisContextCollection analysisContextCollection, List<String> paths) async {
+Future<List<AnalysisError>> collectAnalyzerErrors(String ruleId, AnalysisContextCollection analysisContextCollection, List<String> paths) async {
   final analysisErrors = <AnalysisError>[];
   for (final filePath in paths) {
     final normalizedPath = normalize(filePath);
     final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    final issuesInFile = ClickableWidgetIdMissing(unit.unit, null);
-    // analysisErrors.addAll(issuesInFile
-    //     .map((issue) => analysisErrorFor(filePath, issue, unit.unit)));
+    var targetRule = ruleConfigs[ruleId];
+    Rule issuesInFile = targetRule(unit.unit, unit);
     analysisErrors.addAll(issuesInFile.errors().map((e) => e.error).toList());
   }
   return analysisErrors;

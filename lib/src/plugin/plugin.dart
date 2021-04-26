@@ -51,9 +51,6 @@ class TestPlugin extends ServerPlugin {
 
   @override
   AnalysisDriverGeneric createAnalysisDriver(plugin.ContextRoot contextRoot) {
-    // logUtil.info('root = ${contextRoot.root}');
-    // logUtil.info('exclude = ${contextRoot.exclude}');
-    // logUtil.info('pathContext = ${resourceProvider.pathContext}');
     final analysisRoot = analyzer.ContextRoot(contextRoot.root, contextRoot.exclude, pathContext: resourceProvider.pathContext)
       ..optionsFilePath = contextRoot.optionsFile;
 
@@ -69,7 +66,6 @@ class TestPlugin extends ServerPlugin {
     runZonedGuarded(() {
       dartDriver.results.listen((analysisResult) {
         _processResult(dartDriver, analysisResult);
-        // logUtil.info('analysisResult= ${analysisResult.errors.first.toString()}');
       });
     }, (e, stackTrace) {
       channel.sendNotification(plugin.PluginErrorParams(false, e.toString(), stackTrace.toString()).toNotification());
@@ -135,11 +131,7 @@ class TestPlugin extends ServerPlugin {
         String _fullName = analysisResult.unit.declaredElement.source.fullName;
 
         var globList = _options.excludes.map((e) => Glob(p.join(_sourceUri, e))).toList();
-        // for (final v in globList) {
-        //   logUtil.info('匹配：$v, ${v.matches(_fullName)}, $_fullName');
-        // }
         if (globList.any((glob) => glob.matches(_fullName))) {
-          // logUtil.info('命中：$_fullName');
           return;
         }
 
@@ -176,20 +168,14 @@ class TestPlugin extends ServerPlugin {
       List<ErrorIssue> errorList = [];
       List<Rule> ruleList = [];
       for (final ruleId in _options.rules) {
-        // logUtil.info('ruleTypesssruleId = $ruleId');
         var ruleType = ruleConfigs[ruleId];
-        // logUtil.info('ruleTypesss = $ruleType');
         if (ruleType != null) {
           errorList.addAll(ruleType(analysisResult.unit, analysisResult).errors());
           ruleList.add(ruleType(analysisResult.unit, analysisResult));
         }
       }
-      // logUtil.info('fixErrlist = $errorList');
-      // final parametersMissing = ClickableWidgetIdMissing(analysisResult.unit, analysisResult);
-      // var errorList = parametersMissing.errors();
       var _fixes = errorList
           .where((error) {
-            // logUtil.info('fixesIsNull = ${error.fixes}, isTrue = ${error.fixes == null}');
             return error.replacement != null &&
                 error.error.location.file == parameters.file &&
                 error.error.location.offset + error.error.location.length >= parameters.offset &&
@@ -198,8 +184,6 @@ class TestPlugin extends ServerPlugin {
           })
           .map((e) => e.fixes)
           .toList();
-      // logUtil.info('fixErrlist2 = $_fixes');
-      // final fixes = _fixes.where((fix) => true).toList();
 
       return plugin.EditGetFixesResult(_fixes);
     } on Exception catch (e, stackTrace) {

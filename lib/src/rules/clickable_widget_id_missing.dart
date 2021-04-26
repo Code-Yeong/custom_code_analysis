@@ -9,6 +9,8 @@ import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:uuid/uuid.dart';
 
+const List<String> existIdList = [];
+
 class ClickableWidgetIdMissing extends Rule {
   final CompilationUnit _compilationUnit;
   final ResolvedUnitResult analysisResult;
@@ -19,7 +21,7 @@ class ClickableWidgetIdMissing extends Rule {
   static const annotation = 'Clickable';
   static const className = 'ClickableWidget';
   static const requiredField = 'uuid';
-  static const _message = '$className缺少$requiredField参数';
+  static const _message = '$className缺少$requiredField参数xx';
   static const _correction = '$requiredField为$className必备参数，点击"$_comment"一键修复';
 
   ClickableWidgetIdMissing(this._compilationUnit, this.analysisResult) {
@@ -34,11 +36,8 @@ class ClickableWidgetIdMissing extends Rule {
   String get _code => Uuid().v4().toString().replaceAll('-', '');
 
   String _generateReplacement(InstanceCreationExpression node) {
-    // return 'example........str';
     int left = _getLineNumber(node.argumentList.leftParenthesis);
     int right = _getLineNumber(node.argumentList.rightParenthesis);
-    // logUtil.info('node = ,left = $left, ${node.argumentList.leftParenthesis.offset}, ${node}');
-    // return '';
     String result;
     String _randomId = Uuid().v4().toString().replaceAll('-', '');
     String content = analysisResult.content;
@@ -53,13 +52,12 @@ class ClickableWidgetIdMissing extends Rule {
     return result;
   }
 
+  @override
   List<ErrorIssue> errors() {
-    // final visitor = _MirrorVisitor();
     final visitor = _ParameterVisitor();
     _compilationUnit.accept(visitor);
     return visitor.nodes.map(
       (node) {
-        // node.arguments.add(astFactory.assignmentExpression("$requiredField", TokenType.AMPERSAND, "fdf"));
         return ErrorIssue(
           error: plugin.AnalysisError(
             plugin.AnalysisErrorSeverity.INFO,
@@ -156,6 +154,7 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
       var argumentList = node.argumentList.arguments;
       bool _isNeedFix = true;
       for (final item in argumentList) {
+        print('beginToken: ${item.beginToken.lexeme}, endToken: ${item.endToken.lexeme}');
         if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
           _isNeedFix = false;
           break;
