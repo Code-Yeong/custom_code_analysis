@@ -3,6 +3,8 @@ class ViewModel {
   void log() {
 
     RoundButton.circle(name: '12312', uuid: 'abcde');
+
+    RoundButton.circle(name: '456', uuid: 'abcde');
   }
 }
 

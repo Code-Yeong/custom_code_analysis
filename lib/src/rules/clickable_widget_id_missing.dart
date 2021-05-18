@@ -9,7 +9,7 @@ import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:uuid/uuid.dart';
 
-const List<String> existIdList = [];
+List<String> existIdList = [];
 
 class ClickableWidgetIdMissing extends Rule {
   final CompilationUnit _compilationUnit;
@@ -154,10 +154,13 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
       var argumentList = node.argumentList.arguments;
       bool _isNeedFix = true;
       for (final item in argumentList) {
-        print('beginToken: ${item.beginToken.lexeme}, endToken: ${item.endToken.lexeme}');
+        // print('beginToken: ${item.beginToken.lexeme}, endToken: ${item.endToken.lexeme}');
         if (item.beginToken.lexeme == ClickableWidgetIdMissing.requiredField) {
-          _isNeedFix = false;
-          break;
+          if (!existIdList.contains(item.endToken.lexeme)) {
+            existIdList.add(item.endToken.lexeme);
+            _isNeedFix = false;
+            break;
+          }
         }
       }
       if (_isNeedFix) {
