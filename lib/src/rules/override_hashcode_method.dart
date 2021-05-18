@@ -1,90 +1,58 @@
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer_plugin/protocol/protocol_common.dart' as plugin;
-import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
+import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
-import 'package:custom_code_analysis/src/utils/ingores.dart';
+import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 
 class OverrideHashcodeMethod extends Rule {
-  final CompilationUnit _compilationUnit;
-  final ResolvedUnitResult analysisResult;
-  String unitPath;
-  Suppressions _ignores;
-  static const ruleId = 'override-hashCode-method';
-  static const code = ruleId;
-  static const methodName = 'hashCode';
-  static const comment = '快速修复';
-  static const message = '$methodName不全';
-  static const correction = '$methodName中要包含每个field';
-
-  OverrideHashcodeMethod(this._compilationUnit, this.analysisResult) {
-    unitPath = this._compilationUnit.declaredElement.source.fullName;
-    _ignores = Suppressions(analysisResult.content, _compilationUnit.lineInfo);
-  }
+  OverrideHashcodeMethod(
+    String ruleId,
+    ResolvedUnitResult analysisResult,
+  ) : super(ruleId: ruleId, analysisResult: analysisResult);
 
   @override
-  Iterable<ErrorIssue> errors() {
-    final visitor = _MirrorVisitor(_compilationUnit, _ignores);
-    _compilationUnit.accept(visitor);
-    return visitor.nodes.map(
-      (node) {
-        return ErrorIssue(
-          error: plugin.AnalysisError(
-            plugin.AnalysisErrorSeverity.INFO,
-            plugin.AnalysisErrorType.HINT,
-            plugin.Location(
-              _compilationUnit.declaredElement.source.fullName,
-              node.offset,
-              node.length,
-              _compilationUnit.lineInfo.getLocation(node.offset).lineNumber,
-              _compilationUnit.lineInfo.getLocation(node.offset).columnNumber,
-            ),
-            message,
-            code,
-            correction: correction,
-            hasFix: true,
-          ),
-          replacement: generateReplacement(node),
-        );
-      },
-    ).toList();
-  }
+  String get code => ruleId;
 
-  plugin.AnalysisErrorFixes codeIssueToAnalysisErrorFixes2(ErrorIssue error, ResolvedUnitResult unitResult) {
-    return plugin.AnalysisErrorFixes(
-      error.error,
-      fixes: [
-        if (error.error.correction != null)
-          plugin.PrioritizedSourceChange(
-            99,
-            plugin.SourceChange(
-              comment,
-              edits: [
-                plugin.SourceFileEdit(
-                  unitResult.libraryElement.source.fullName,
-                  unitResult.libraryElement.source.modificationStamp,
-                  edits: [
-                    plugin.SourceEdit(
-                      error.error.location.offset,
-                      error.error.location.length,
-                      error.replacement,
-                    ),
-                  ],
-                ),
-              ],
-              // selection: Position(unitResult.libraryElement.source.fullName, issue.offset),
-            ),
-          ),
-      ],
-    );
+  @override
+  String get comment => '快速修复';
+
+  @override
+  String get correction => '$methodName中要包含每个field';
+
+  @override
+  String get message => '$methodName不全';
+
+  @override
+  String get methodName => 'hashCode';
+
+  @override
+  Iterable<Issue> check() {
+    final visitor = _MirrorVisitor(analysisResult, this);
+    analysisResult.unit.accept(visitor);
+
+    return visitor.nodes
+        .map((node) => Issue(
+              errorSeverity: AnalysisErrorSeverity.INFO,
+              errorType: AnalysisErrorType.HINT,
+              offset: node.offset,
+              length: node.length,
+              line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
+              message: message,
+              code: code,
+              correction: correction,
+              replacement: generateReplacement(node),
+              hasFix: false,
+            ))
+        .toList();
   }
 
   String generateReplacement(ExpressionFunctionBody node) {
     String fixStr = '';
     var className = node.parent.parent.beginToken.next.lexeme;
-    var targetElement = _compilationUnit.declaredElement.library.getType(className);
+    var targetElement = analysisResult.unit.declaredElement.library.getType(className);
     if (targetElement.supertype.getDisplayString(withNullability: false) == 'ReduxViewModel') {
       var fields = targetElement.unnamedConstructor.parameters;
       for (final field in fields) {
@@ -101,10 +69,10 @@ class OverrideHashcodeMethod extends Rule {
 
 class _MirrorVisitor extends RecursiveAstVisitor<void> {
   final _nodes = <AstNode>[];
-  final Suppressions _ignores;
-  final CompilationUnit _compilationUnit;
+  final ResolvedUnitResult analysisResult;
+  final Rule rule;
 
-  _MirrorVisitor(this._compilationUnit, this._ignores);
+  _MirrorVisitor(this.analysisResult, this.rule);
 
   Iterable<AstNode> get nodes => _nodes;
 
@@ -117,7 +85,7 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
             if (node.parent.beginToken.next.next.next.next.lexeme == 'hashCode') {
               bool _needFix = false;
               var className = node.parent.parent.beginToken.next.lexeme;
-              var targetElement = _compilationUnit.declaredElement.library.getType(className);
+              var targetElement = analysisResult.unit.declaredElement.library.getType(className);
               if (targetElement.supertype.getDisplayString(withNullability: false) == 'ReduxViewModel') {
                 var fields = targetElement.unnamedConstructor.parameters;
                 String hashString = node.expression.toString();
@@ -132,8 +100,9 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
                 }
               }
               if (_needFix) {
-                int lineNumber = _compilationUnit.lineInfo.getLocation(node.offset).lineNumber;
-                if (!_ignores.isSuppressedAt(OverrideHashcodeMethod.ruleId, lineNumber)) {
+                int lineNumber = analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber;
+                var ignoreInfo = IgnoreInfo.forDart(analysisResult.unit, analysisResult.content);
+                if (!ignoreInfo.ignoredAt(rule.code, lineNumber)) {
                   _nodes.add(node);
                 }
               }

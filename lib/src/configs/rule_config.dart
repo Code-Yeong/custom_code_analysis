@@ -10,6 +10,7 @@ import 'package:custom_code_analysis/src/rules/avoid_using_show_menu.dart';
 import 'package:custom_code_analysis/src/rules/avoid_using_show_search.dart';
 import 'package:custom_code_analysis/src/rules/avoid_using_show_time_picker.dart';
 import 'package:custom_code_analysis/src/rules/clickable_widget_id_missing.dart';
+import 'package:custom_code_analysis/src/rules/override_hashcode_method.dart';
 import '../model/rule.dart';
 
 Rule findRule(String ruleId, ResolvedUnitResult analysisResult) {
@@ -25,5 +26,6 @@ Rule findRule(String ruleId, ResolvedUnitResult analysisResult) {
     'avoid-using-show-search': AvoidUsingShowSearch('avoid-using-show-search', analysisResult),
     'avoid-using-show-time-picker': AvoidUsingShowTimePicker('avoid-using-show-time-picker', analysisResult),
     'clickable-widget-uuid-missing': ClickableWidgetIdMissing('clickable-widget-uuid-missing', analysisResult),
+    'override-hashCode-method': OverrideHashcodeMethod('override-hashCode-method', analysisResult),
   }[ruleId];
 }
