@@ -154,6 +154,17 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
                   item.endToken.lexeme.replaceAll('\'', '') == ' ' ||
                   item.endToken.lexeme.isEmpty)) {
             _isNeedFix = true;
+          } else if (((item.beginToken.lexeme.endsWith('uuid') || item.beginToken.lexeme.endsWith('Uuid'))) &&
+              !(item.endToken.lexeme == null ||
+                  item.endToken.lexeme == 'null' ||
+                  item.endToken.lexeme.replaceAll('\'', '') == '' ||
+                  item.endToken.lexeme.replaceAll('\'', '') == ' ' ||
+                  item.endToken.lexeme.isEmpty)) {
+            if (existIdList.contains(item.endToken.lexeme)) {
+              _isNeedFix = true;
+            } else {
+              existIdList.add(item.endToken.lexeme);
+            }
           }
         }
       }

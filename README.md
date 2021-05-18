@@ -2,7 +2,7 @@
 1.Add dependency to `pubspec.yaml`
 ```
 dependencies:
-  custom_code_analysis: ^0.0.9
+  custom_code_analysis: ^1.0.1-dev.1
 ```
 2.Add configuration to `analysis_options.yaml`
 ```
@@ -25,6 +25,7 @@ custom_code_analysis:
     - avoid-using-show-search
     - avoid-using-show-time-picker
     - avoid-using-colors
+    - override-hashCode-method
 ```
 
 # Rules
@@ -39,3 +40,4 @@ custom_code_analysis:
 - avoid-using-show-search
 - avoid-using-show-time-picker
 - avoid-using-colors
+- override-hashCode-method

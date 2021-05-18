@@ -57,7 +57,8 @@ Future<List<AnalysisError>> collectAnalyzerErrors(AnalysisContextCollection anal
     // final issuesInFile = ClickableWidgetIdMissing(null, unit);
 
     // test ignored
-    final rule = AvoidUsingShowDialog('avoid-using-show-dialog', unit);
+    // final rule = AvoidUsingShowDialog('avoid-using-show-dialog', unit);
+    final rule = ClickableWidgetIdMissing('clickable-widget-uuid-missing', unit);
     analysisErrors.addAll(rule.check().map((e) => codeIssueToAnalysisError(e, unit)).toList());
   }
   return analysisErrors;

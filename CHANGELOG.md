@@ -55,4 +55,7 @@
 - bug fix  
 
 ## 1.0.0
-- refactored the plugin                  
+- refactored the plugin
+
+## 1.0.1-dev.1
+- bug fix                  
