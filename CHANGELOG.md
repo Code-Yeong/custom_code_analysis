@@ -40,4 +40,19 @@
 - support `@Clickable`
 
 ## 0.0.9
-- bug fix        
+- bug fix
+
+## 0.0.10
+- bug fix
+
+## 0.0.10+1
+- new feature
+
+## 0.0.10+2
+- bug fix
+
+## 0.0.10+3
+- bug fix  
+
+## 1.0.0
+- refactored the plugin                  

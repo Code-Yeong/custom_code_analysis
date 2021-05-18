@@ -1,32 +1,51 @@
+import 'test2.dart';
+
 var a = ClickableWidget();
-class ViewModel {
+
+class Test {
   void log() {
 
-    RoundButton.circle(name: '12312', uuid: 'abcde');
+    RoundButton.circle(name: 'fdsfds1', uuid: null, testUuid: '');
 
-    RoundButton.circle(name: '456', uuid: 'abcde');
+    RoundButton.circle(name: 'fdsfds2', uuid: '123');
+
+    RoundButton.circle(
+      name: 'fdsfds3',
+      uuid: '',
+      testUuid: '',
+    );
+
+    showDialog();
+    // ignore: avoid-using-show-dialog
+    showDialog();
   }
+
+
 }
 
-class ClickableWidget {
-  final String uuid;
-  ClickableWidget({this.uuid});
-}
-
-class Clickable {
-  final String message;
-
-  const Clickable({this.message});
-}
-
-@Clickable()
-class RoundButton {
-  RoundButton({this.name, this.uuid});
-
-  final String name;
-  final String uuid;
-
-  factory RoundButton.circle({String uuid, String name}) {
-    return RoundButton(uuid: uuid);
-  }
-}
+void showDialog(){}
+//
+// class ClickableWidget {
+//   final String uuid;
+//
+//   ClickableWidget({this.uuid});
+// }
+//
+// class Clickable {
+//   final String message;
+//
+//   const Clickable({this.message});
+// }
+//
+// @Clickable()
+// class RoundButton {
+//   RoundButton({this.name, this.uuid, this.testUuid});
+//
+//   final String name;
+//   final String uuid;
+//   final String testUuid;
+//
+//   factory RoundButton.circle({String uuid, String name, String testUuid}) {
+//     return RoundButton(uuid: uuid);
+//   }
+// }

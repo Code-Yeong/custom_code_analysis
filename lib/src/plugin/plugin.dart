@@ -8,26 +8,26 @@ import 'package:analyzer/src/context/context_root.dart' as analyzer;
 import 'package:analyzer/src/dart/analysis/driver.dart';
 import 'package:analyzer_plugin/plugin/plugin.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
+import 'package:analyzer_plugin/protocol/protocol_generated.dart';
+import 'package:custom_code_analysis/src/logger/log.dart';
+import 'package:custom_code_analysis/src/utils/issue_map_util.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 import 'package:custom_code_analysis/src/configs/rule_config.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
-import 'package:custom_code_analysis/src/utils/yaml_utils.dart';
+import 'package:yaml/yaml.dart';
 
-import '../logger/log.dart';
 import '../model/analysis_options.dart';
-import '../model/rule.dart';
 
 // class TestPlugin extends ServerPlugin with FixesMixin, DartFixesMixin {
-class TestPlugin extends ServerPlugin {
-  TestPlugin(ResourceProvider provider) : super(provider);
 
-  // static const excludedFolders = ['.dart_tool/**'];
+class CustomCodeAnalysisPlugin extends ServerPlugin {
+  CustomCodeAnalysisPlugin(ResourceProvider provider) : super(provider);
 
   var _filesFromSetPriorityFilesRequest = <String>[];
 
-  AnalysisOptions _options;
+  YamlMap _yamlMap;
 
   String _sourceUri;
 
@@ -38,7 +38,7 @@ class TestPlugin extends ServerPlugin {
   String get name => 'Custom Code Analysis';
 
   @override
-  String get version => '0.0.9';
+  String get version => '1.0.0';
 
   @override
   bool isCompatibleWith(Version serverVersion) => true;
@@ -51,6 +51,8 @@ class TestPlugin extends ServerPlugin {
 
   @override
   AnalysisDriverGeneric createAnalysisDriver(plugin.ContextRoot contextRoot) {
+    logUtil.info('createAnalysisDriver for: ${contextRoot.root}');
+    _yamlMap = AnalysisOptionsProvider().getOptionsFromString(contextRoot.optionsFile);
     final analysisRoot = analyzer.ContextRoot(contextRoot.root, contextRoot.exclude, pathContext: resourceProvider.pathContext)
       ..optionsFilePath = contextRoot.optionsFile;
 
@@ -61,17 +63,22 @@ class TestPlugin extends ServerPlugin {
       ..fileContentOverlay = fileContentOverlay;
 
     final dartDriver = contextBuilder.buildDriver(analysisRoot);
-    _options = _readOptions(dartDriver);
     _sourceUri = _getSourceUri(dartDriver);
-    runZonedGuarded(() {
-      dartDriver.results.listen((analysisResult) {
-        _processResult(dartDriver, analysisResult);
-      });
-    }, (e, stackTrace) {
-      channel.sendNotification(plugin.PluginErrorParams(false, e.toString(), stackTrace.toString()).toNotification());
-    });
+    runZonedGuarded(
+      () {
+        dartDriver.results.listen((analysisResult) {
+          logUtil.info('received analysis result from file: ${contextRoot.root}');
+          _processResult(dartDriver, analysisResult);
+        });
+      },
+      _onError,
+    );
 
     return dartDriver;
+  }
+
+  void _onError(Object e, StackTrace stackTrace) {
+    channel.sendNotification(plugin.PluginErrorParams(false, e.toString(), stackTrace.toString()).toNotification());
   }
 
   @override
@@ -106,47 +113,28 @@ class TestPlugin extends ServerPlugin {
     return _uri;
   }
 
-  AnalysisOptions _readOptions(AnalysisDriver driver) {
-    if (driver?.contextRoot?.optionsFilePath?.isNotEmpty ?? false) {
-      final file = resourceProvider.getFile(driver.contextRoot.optionsFilePath);
-      if (file.exists) {
-        var map = yamlMapToDartMap(AnalysisOptionsProvider(driver.sourceFactory).getOptionsFromFile(file));
-        // logUtil.info('yamlConfig = ${map}');
-        try {
-          AnalysisOptions options = AnalysisOptions.fromMap(map);
-          // logUtil.info('return options = $options');
-          return options;
-        } catch (e) {
-          logUtil.info('error = $e');
-        }
-      }
-    }
-
-    return null;
-  }
-
   void _processResult(AnalysisDriver driver, ResolvedUnitResult analysisResult) {
     try {
       if (analysisResult.unit != null && analysisResult.libraryElement != null) {
         String _fullName = analysisResult.unit.declaredElement.source.fullName;
 
-        var globList = _options.excludes.map((e) => Glob(p.join(_sourceUri, e))).toList();
+        var globList = AnalysisOptions.fromYamlMap(_yamlMap).excludes.map((e) => Glob(p.join(_sourceUri, e))).toList();
         if (globList.any((glob) => glob.matches(_fullName))) {
           return;
         }
 
-        List<ErrorIssue> errorList = [];
-        for (final ruleId in _options.rules) {
-          var ruleType = ruleConfigs[ruleId];
-          if (ruleType != null) {
-            errorList.addAll(ruleType(analysisResult.unit, analysisResult).errors());
+        List<Issue> issueList = [];
+        for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules) {
+          var rule = findRule(ruleId, analysisResult);
+          if (rule != null) {
+            issueList.addAll(rule.check());
           }
         }
-        if (errorList.isNotEmpty) {
+        if (issueList.isNotEmpty) {
           channel.sendNotification(
             plugin.AnalysisErrorsParams(
               analysisResult.path,
-              errorList.map((e) => e.error).toList(),
+              issueList.map((issue) => codeIssueToAnalysisError(issue, analysisResult)).toList(),
             ).toNotification(),
           );
         } else {
@@ -165,27 +153,16 @@ class TestPlugin extends ServerPlugin {
     try {
       final driver = driverForPath(parameters.file) as AnalysisDriver;
       final analysisResult = await driver.getResult(parameters.file);
-      List<ErrorIssue> errorList = [];
-      List<Rule> ruleList = [];
-      for (final ruleId in _options.rules) {
-        var ruleType = ruleConfigs[ruleId];
-        if (ruleType != null) {
-          errorList.addAll(ruleType(analysisResult.unit, analysisResult).errors());
-          ruleList.add(ruleType(analysisResult.unit, analysisResult));
+
+      List<AnalysisErrorFixes> errorFixes = [];
+      for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules) {
+        var rule = findRule(ruleId, analysisResult);
+        if (rule != null) {
+          errorFixes.addAll(codeIssueToAnalysisErrorFixes(rule.check(), analysisResult));
         }
       }
-      var _fixes = errorList
-          .where((error) {
-            return error.replacement != null &&
-                error.error.location.file == parameters.file &&
-                error.error.location.offset + error.error.location.length >= parameters.offset &&
-                error.error.location.offset <= parameters.offset &&
-                error.fixes != null;
-          })
-          .map((e) => e.fixes)
-          .toList();
 
-      return plugin.EditGetFixesResult(_fixes);
+      return plugin.EditGetFixesResult(errorFixes);
     } on Exception catch (e, stackTrace) {
       channel.sendNotification(plugin.PluginErrorParams(false, e.toString(), stackTrace.toString()).toNotification());
 

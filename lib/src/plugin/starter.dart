@@ -7,5 +7,5 @@ import '../logger/log.dart';
 
 void start(List<String> args, SendPort sendPort) {
   logUtil.info('-----------analysis server restarted-------------');
-  ServerPluginStarter(TestPlugin(PhysicalResourceProvider.INSTANCE)).start(sendPort);
+  ServerPluginStarter(CustomCodeAnalysisPlugin(PhysicalResourceProvider.INSTANCE)).start(sendPort);
 }
