@@ -15,8 +15,8 @@ const _rulesKey = 'rules';
 class AnalysisOptions {
   static AnalysisOptions fromYamlMap(YamlMap yamlMap) {
     return AnalysisOptions(
-      rules: getKey(yamlMap, _rulesKey).value,
-      excludes: getKey(yamlMap, _customExcludeKey).value,
+      rules: yamlMap.getKey(_rulesKey).value,
+      excludes: yamlMap.getKey(_customExcludeKey).value,
     );
   }
 

@@ -25,12 +25,12 @@ List<String> excludedFilesFromAnalysisOptions(File analysisOptions) {
   return [];
 }
 
-List<String> resolvePaths(List<String> paths, List<String> excludedFolders) {
-  final excludedGlobs = excludedFolders.map((path) => Glob(path)).toList();
-  return paths
-      .expand((path) => Glob('$path/**/*.dart').listSync().whereType<File>().where((file) => !_isExcluded(file.path, excludedGlobs)).map((e) => e.path))
-      .toList();
-}
+// List<String> resolvePaths(List<String> paths, List<String> excludedFolders) {
+//   final excludedGlobs = excludedFolders.map((path) => Glob(path)).toList();
+//   return paths
+//       .expand((path) => Glob('$path/**/*.dart').listSync().whereType<File>().where((file) => !_isExcluded(file.path, excludedGlobs)).map((e) => e.path))
+//       .toList();
+// }
 
 bool _isExcluded(String filePath, Iterable<Glob> excludes) => excludes.any((exclude) => exclude.matches(filePath));
 
@@ -76,6 +76,8 @@ AnalysisError codeIssueToAnalysisError(Issue issue, ResolvedUnitResult analysisR
       issue.length,
       issue.line,
       issue.column,
+      issue.endLine,
+      issue.endColumn,
     ),
     issue.message,
     issue.code,

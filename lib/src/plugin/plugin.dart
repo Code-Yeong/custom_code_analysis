@@ -59,10 +59,9 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
     final contextBuilder = ContextBuilder(resourceProvider, sdkManager, null)
       ..analysisDriverScheduler = analysisDriverScheduler
       ..byteStore = byteStore
-      ..performanceLog = performanceLog
-      ..fileContentOverlay = fileContentOverlay;
+      ..performanceLog = performanceLog;
 
-    final dartDriver = contextBuilder.buildDriver(analysisRoot);
+    final dartDriver = contextBuilder.buildDriver(analysisRoot, null);
     _sourceUri = _getSourceUri(dartDriver);
     runZonedGuarded(
       () {

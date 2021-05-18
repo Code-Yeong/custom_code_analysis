@@ -40,6 +40,8 @@ class OverrideHashcodeMethod extends Rule {
               length: node.length,
               line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
               column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
+              endLine: analysisResult.unit.lineInfo.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit.lineInfo.getLocation(node.end).columnNumber,
               message: message,
               code: code,
               correction: correction,

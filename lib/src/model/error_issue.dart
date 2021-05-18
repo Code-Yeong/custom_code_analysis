@@ -7,6 +7,8 @@ class Issue {
     this.length,
     this.line,
     this.column,
+    this.endLine,
+    this.endColumn,
     this.message,
     this.code,
     this.correction,
@@ -21,7 +23,9 @@ class Issue {
   final int offset;
   final int length;
   final int line;
+  final int endLine;
   final int column;
+  final int endColumn;
   final String message;
   final String code;
   final String correction;

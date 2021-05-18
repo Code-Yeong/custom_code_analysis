@@ -13,6 +13,8 @@ AnalysisError codeIssueToAnalysisError(Issue issue, ResolvedUnitResult analysisR
       issue.length,
       issue.line,
       issue.column,
+      issue.endLine,
+      issue.endColumn,
     ),
     issue.message,
     issue.code,
