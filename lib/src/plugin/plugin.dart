@@ -124,9 +124,9 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
 
         List<Issue> issueList = [];
         for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules) {
-          var rule = findRule(ruleId, analysisResult);
+          var rule = findRuleById(ruleId);
           if (rule != null) {
-            issueList.addAll(rule.check());
+            issueList.addAll(rule.check(analysisResult));
           }
         }
         if (issueList.isNotEmpty) {
@@ -151,13 +151,13 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
   Future<plugin.EditGetFixesResult> handleEditGetFixes(plugin.EditGetFixesParams parameters) async {
     try {
       final driver = driverForPath(parameters.file) as AnalysisDriver;
-      final analysisResult = await driver.getResult(parameters.file);
+      final analysisResult = await driver.getResult2(parameters.file);
 
       List<AnalysisErrorFixes> errorFixes = [];
       for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules) {
-        var rule = findRule(ruleId, analysisResult);
+        var rule = findRuleById(ruleId);
         if (rule != null) {
-          errorFixes.addAll(codeIssueToAnalysisErrorFixes(rule.check(), analysisResult));
+          errorFixes.addAll(codeIssueToAnalysisErrorFixes(rule.check(analysisResult), analysisResult));
         }
       }
 

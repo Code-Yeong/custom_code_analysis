@@ -1,11 +1,7 @@
-import 'package:analyzer/dart/analysis/results.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 
 class AvoidUsingShowMenu extends Rule {
-  AvoidUsingShowMenu(
-    String ruleId,
-    ResolvedUnitResult analysisResult,
-  ) : super(ruleId: ruleId, analysisResult: analysisResult);
+  AvoidUsingShowMenu(String ruleId) : super(ruleId: ruleId);
 
   @override
   String get code => ruleId;

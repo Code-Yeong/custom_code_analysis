@@ -1,17 +1,7 @@
-import 'package:analyzer/dart/analysis/results.dart';
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer_plugin/protocol/protocol_common.dart' as plugin;
-import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
-import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 
 class AvoidUsingShowDateRangePicker extends Rule {
-
-  AvoidUsingShowDateRangePicker(
-      String ruleId,
-      ResolvedUnitResult analysisResult,
-      ) : super(ruleId: ruleId, analysisResult: analysisResult);
+  AvoidUsingShowDateRangePicker(String ruleId) : super(ruleId: ruleId);
 
   @override
   String get code => ruleId;
@@ -27,5 +17,4 @@ class AvoidUsingShowDateRangePicker extends Rule {
 
   @override
   String get methodName => 'showDateRangePicker';
-
 }

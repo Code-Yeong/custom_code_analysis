@@ -16,6 +16,7 @@ class Issue {
     this.replacement,
     this.errorSeverity,
     this.errorType,
+    this.filePath,
   });
 
   final bool hasFix;
@@ -31,6 +32,7 @@ class Issue {
   final String correction;
   final String comment;
   final String replacement;
+  final String filePath;
 
   final AnalysisErrorSeverity errorSeverity;
   final AnalysisErrorType errorType;

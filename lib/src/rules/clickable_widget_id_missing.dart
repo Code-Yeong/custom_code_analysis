@@ -2,11 +2,7 @@ import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer_plugin/protocol/protocol_common.dart' as plugin;
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
-import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
-import 'package:analyzer_plugin/protocol/protocol_generated.dart';
-import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:uuid/uuid.dart';
@@ -14,10 +10,7 @@ import 'package:uuid/uuid.dart';
 List<String> existIdList = [];
 
 class ClickableWidgetIdMissing extends Rule {
-  ClickableWidgetIdMissing(
-    String ruleId,
-    ResolvedUnitResult analysisResult,
-  ) : super(ruleId: ruleId, analysisResult: analysisResult);
+  ClickableWidgetIdMissing(String ruleId) : super(ruleId: ruleId);
 
   @override
   String get code => ruleId;
@@ -38,11 +31,11 @@ class ClickableWidgetIdMissing extends Rule {
   static const className = 'ClickableWidget';
   static const requiredField = 'uuid';
 
-  int _getLineNumber(Token token) {
+  int _getLineNumber(Token token, ResolvedUnitResult analysisResult) {
     return analysisResult.unit.lineInfo.getLocation(token.offset).lineNumber;
   }
 
-  String _generateReplacement(InstanceCreationExpression node) {
+  String _generateReplacement(InstanceCreationExpression node, ResolvedUnitResult analysisResult) {
     List<Expression> expressionList = [];
     var argumentList = node.argumentList.arguments;
 
@@ -51,8 +44,8 @@ class ClickableWidgetIdMissing extends Rule {
     if (node.constructorName.type?.name?.name == ClickableWidgetIdMissing.className) {
       List<String> _list = argumentList.map((e) => e.beginToken.lexeme).toList();
       if (_list.every((element) => element != ClickableWidgetIdMissing.requiredField)) {
-        int left = _getLineNumber(node.argumentList.leftParenthesis);
-        int right = _getLineNumber(node.argumentList.rightParenthesis);
+        int left = _getLineNumber(node.argumentList.leftParenthesis, analysisResult);
+        int right = _getLineNumber(node.argumentList.rightParenthesis, analysisResult);
         // logUtil.info('node = ,left = $left, ${node.argumentList.leftParenthesis.offset}, ${node}');
         String _randomId = Uuid().v4().toString().replaceAll('-', '');
         if (left == right) {
@@ -96,7 +89,7 @@ class ClickableWidgetIdMissing extends Rule {
   }
 
   @override
-  List<Issue> check() {
+  List<Issue> check(ResolvedUnitResult analysisResult) {
     final visitor = _ParameterVisitor();
     analysisResult.unit.accept(visitor);
     return visitor.nodes
@@ -111,8 +104,9 @@ class ClickableWidgetIdMissing extends Rule {
               code: code,
               comment: comment,
               correction: correction,
-              replacement: _generateReplacement(node),
+              replacement: _generateReplacement(node, analysisResult),
               hasFix: false,
+              filePath: analysisResult.unit.declaredElement.source.fullName,
             ))
         .toList();
   }

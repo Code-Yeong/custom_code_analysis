@@ -1,9 +1,28 @@
 analyzer:
   plugins:
     - custom_code_analysis
+#    - dart_code_metrics
 
 custom_code_analysis:
   exclude:
-#    - "test/**"
   rules:
     - clickable-widget-uuid-missing
+
+#dart_code_metrics:
+#  anti-patterns:
+#    - long-method
+#    - long-parameter-list
+#  metrics:
+#    cyclomatic-complexity: 20
+#    lines-of-executable-code: 50
+#    number-of-arguments: 4
+#    maximum-nesting-level: 5
+#  metrics-exclude:
+#    - test/**
+#  rules:
+#    - newline-before-return
+#    - no-boolean-literal-compare
+#    - no-empty-block
+#    - prefer-trailing-comma
+#    - prefer-conditional-expressions
+#    - no-equal-then-else

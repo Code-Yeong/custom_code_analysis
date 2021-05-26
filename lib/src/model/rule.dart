@@ -1,14 +1,13 @@
 import 'package:analyzer/dart/analysis/results.dart';
-import 'package:analyzer_plugin/protocol/protocol_generated.dart';
+import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/visitors/code_issue_visitor.dart';
 
 import 'error_issue.dart';
-import 'package:analyzer_plugin/protocol/protocol_common.dart';
 
 abstract class Rule {
-  Rule({this.ruleId, this.analysisResult});
+  Rule({this.ruleId});
 
-  Iterable<Issue> check() {
+  Iterable<Issue> check(ResolvedUnitResult analysisResult) {
     final visitor = CodeIssueVisitor(analysisResult: analysisResult, rule: this);
     analysisResult.unit.accept(visitor);
     return visitor.nodes
@@ -25,13 +24,12 @@ abstract class Rule {
               code: code,
               correction: correction,
               hasFix: false,
+              filePath: analysisResult.unit.declaredElement.source.fullName,
             ))
         .toList();
   }
 
   final String ruleId;
-
-  final ResolvedUnitResult analysisResult;
 
   String get code;
 

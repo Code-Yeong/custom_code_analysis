@@ -1,16 +1,13 @@
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
-import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 
 class OverrideHashcodeMethod extends Rule {
-  OverrideHashcodeMethod(
-    String ruleId,
-    ResolvedUnitResult analysisResult,
-  ) : super(ruleId: ruleId, analysisResult: analysisResult);
+  OverrideHashcodeMethod(String ruleId) : super(ruleId: ruleId);
 
   @override
   String get code => ruleId;
@@ -28,7 +25,7 @@ class OverrideHashcodeMethod extends Rule {
   String get methodName => 'hashCode';
 
   @override
-  Iterable<Issue> check() {
+  Iterable<Issue> check(ResolvedUnitResult analysisResult) {
     final visitor = _MirrorVisitor(analysisResult, this);
     analysisResult.unit.accept(visitor);
 
@@ -45,13 +42,14 @@ class OverrideHashcodeMethod extends Rule {
               message: message,
               code: code,
               correction: correction,
-              replacement: generateReplacement(node),
+              replacement: generateReplacement(node, analysisResult),
               hasFix: false,
+              filePath: analysisResult.unit.declaredElement.source.fullName,
             ))
         .toList();
   }
 
-  String generateReplacement(ExpressionFunctionBody node) {
+  String generateReplacement(ExpressionFunctionBody node, ResolvedUnitResult analysisResult) {
     String fixStr = '';
     var className = node.parent.parent.beginToken.next.lexeme;
     var targetElement = analysisResult.unit.declaredElement.library.getType(className);
