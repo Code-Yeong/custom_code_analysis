@@ -41,3 +41,8 @@ custom_code_analysis:
 - avoid-using-show-time-picker
 - avoid-using-colors
 - override-hashCode-method
+
+# Command line tools
+```
+    dart pub run custom_code_analysis:analysis lib
+```

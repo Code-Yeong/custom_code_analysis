@@ -61,4 +61,7 @@
 - bug fix
 
 ## 1.0.1-dev.2
-- Upgrade plugin                          
+- Upgrade plugin
+
+## 1.0.1-dev.3
+- Command line support                             
