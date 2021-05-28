@@ -70,4 +70,7 @@
 - Upgrade plugin version
 
 ## 1.0.1-dev.5
-- Add test cases                               
+- Add test cases
+
+## 1.0.1-dev.6
+- Fix bugs                               

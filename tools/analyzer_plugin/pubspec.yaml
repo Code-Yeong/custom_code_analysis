@@ -1,5 +1,5 @@
 name: custom_code_analysis_bootstrap
-version: 1.0.1-dev.5
+version: 1.0.1-dev.6
 
 environment:
   sdk: '>=2.7.0 <3.0.0'
@@ -7,4 +7,4 @@ environment:
 dependencies:
 #  custom_code_analysis:
 #    path: /Users/chivan/Documents/project/custom_code_analysis
-  custom_code_analysis: ^1.0.1-dev.5
+  custom_code_analysis: ^1.0.1-dev.6

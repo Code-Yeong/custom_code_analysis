@@ -1,6 +1,6 @@
 name: custom_code_analysis
 description: custom code analysis rules
-version: 1.0.1-dev.5
+version: 1.0.1-dev.6
 homepage:
 
 environment:
