@@ -9,6 +9,12 @@ const _rulesKey = 'rules';
 class AnalysisOptions {
   static AnalysisOptions fromYamlMap(YamlMap yamlMap) {
     YamlMap map = yamlMap[_rootKey];
+    if(map == null){
+      return AnalysisOptions(
+        rules: [],
+        excludes: [],
+      );
+    }
     return AnalysisOptions(
       rules: List<String>.from(map[_rulesKey]?.toList() ?? []),
       excludes: List<String>.from(map[_customExcludeKey]?.toList() ?? []),

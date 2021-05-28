@@ -1,11 +1,10 @@
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
-import 'package:custom_code_analysis/src/visitors/code_issue_visitor.dart';
-import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 
 class AvoidUsingColor extends Rule {
   AvoidUsingColor(String ruleId) : super(ruleId: ruleId);

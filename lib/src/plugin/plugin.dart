@@ -105,8 +105,10 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
 
   String _getSourceUri(AnalysisDriver dartDriver) {
     String _uri;
+    // ignore: deprecated_member_use
     String _optionsFile = dartDriver.contextRoot.optionsFilePath;
     if (_optionsFile != null) {
+      // ignore: deprecated_member_use
       _uri = dartDriver.resourceProvider.pathContext.dirname(dartDriver.contextRoot.optionsFilePath);
     }
     return _uri;
