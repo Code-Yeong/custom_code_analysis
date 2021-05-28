@@ -16,10 +16,10 @@ class CodeIssueVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     node.visitChildren(this);
-    if (node.methodName.name.contains(rule.methodName)) {
+    if (node.methodName.name == rule.methodName) {
       int lineNumber = analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber;
       var ignoreInfo = IgnoreInfo.forDart(analysisResult.unit, analysisResult.content);
-      if (!ignoreInfo.ignoredAt(rule.code, lineNumber)) {
+      if (!ignoreInfo.ignoredAt(rule.code.replaceAll('-', '_'), lineNumber)) {
         _nodes.add(node);
       }
     }

@@ -64,4 +64,7 @@
 - Upgrade plugin
 
 ## 1.0.1-dev.3
-- Command line support                             
+- Command line support
+
+## 1.0.1-dev.4
+- Upgrade plugin version                               

@@ -151,7 +151,7 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
   Future<plugin.EditGetFixesResult> handleEditGetFixes(plugin.EditGetFixesParams parameters) async {
     try {
       final driver = driverForPath(parameters.file) as AnalysisDriver;
-      final analysisResult = await driver.getResult2(parameters.file);
+      final analysisResult = await driver.getResult(parameters.file);
 
       List<AnalysisErrorFixes> errorFixes = [];
       for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules) {

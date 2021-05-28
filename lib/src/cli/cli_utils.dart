@@ -38,7 +38,7 @@ Future<List<AnalysisError>> collectAnalyzerErrors(AnalysisContextCollection anal
     final normalizedPath = normalize(filePath);
     // var stopWatch = Stopwatch();
     // stopWatch.start();
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit2(normalizedPath);
+    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     // ParsedUnitResult parsedUnit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getParsedUnit(normalizedPath);
     // stopWatch.stop();
     // print('timeCost = ${stopWatch.elapsedMilliseconds}'); //timeCost = 2345 , 80

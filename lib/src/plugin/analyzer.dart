@@ -7,6 +7,7 @@ import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:custom_code_analysis/src/cli/config.dart';
 import 'package:custom_code_analysis/src/cli/store.dart';
 import 'package:custom_code_analysis/src/configs/rule_config.dart';
+import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:file/local.dart';
@@ -29,6 +30,7 @@ class CustomAnalyzer {
 
   /// Return a future that will complete after static analysis done for files from [folders].
   Future<void> runAnalysis(Iterable<String> folders, String rootFolder) async {
+    logUtil.info('folders = $folders, rootFolder = $rootFolder');
     final collection = AnalysisContextCollection(
       includedPaths: folders.map((path) => p.normalize(p.join(rootFolder, path))).toList(),
       resourceProvider: PhysicalResourceProvider.INSTANCE,

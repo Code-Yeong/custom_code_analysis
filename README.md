@@ -24,8 +24,9 @@ custom_code_analysis:
     - avoid-using-show-menu
     - avoid-using-show-search
     - avoid-using-show-time-picker
+    - avoid-using-color
     - avoid-using-colors
-    - override-hashCode-method
+    - override-hash-code-method
 ```
 
 # Rules
@@ -39,8 +40,9 @@ custom_code_analysis:
 - avoid-using-show-menu
 - avoid-using-show-search
 - avoid-using-show-time-picker
+- avoid-using-color
 - avoid-using-colors
-- override-hashCode-method
+- override-hash-code-method
 
 # Command line tools
 ```

@@ -7,8 +7,8 @@ import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:custom_code_analysis/src/visitors/code_issue_visitor.dart';
 import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 
-class AvoidUsingColors extends Rule {
-  AvoidUsingColors(String ruleId) : super(ruleId: ruleId);
+class AvoidUsingColor extends Rule {
+  AvoidUsingColor(String ruleId) : super(ruleId: ruleId);
 
   @override
   String get code => ruleId;
@@ -23,11 +23,11 @@ class AvoidUsingColors extends Rule {
   String get message => '禁止使用原生$methodName类';
 
   @override
-  String get methodName => 'Colors';
+  String get methodName => 'Color';
 
   @override
   Iterable<Issue> check(ResolvedUnitResult analysisResult) {
-    final visitor = ColorsCodeIssueVisitor(analysisResult: analysisResult, rule: this);
+    final visitor = ColorCodeIssueVisitor(analysisResult: analysisResult, rule: this);
     analysisResult.unit.accept(visitor);
     return visitor.nodes
         .map((node) => Issue(
@@ -49,12 +49,12 @@ class AvoidUsingColors extends Rule {
   }
 }
 
-class ColorsCodeIssueVisitor extends RecursiveAstVisitor<void> {
+class ColorCodeIssueVisitor extends RecursiveAstVisitor<void> {
   final _nodes = <AstNode>[];
   final ResolvedUnitResult analysisResult;
   final Rule rule;
 
-  ColorsCodeIssueVisitor({this.analysisResult, this.rule});
+  ColorCodeIssueVisitor({this.analysisResult, this.rule});
 
   Iterable<AstNode> get nodes => _nodes;
 

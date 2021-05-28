@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/visitors/code_issue_visitor.dart';
+import 'package:meta/meta.dart';
 
 import 'error_issue.dart';
 
