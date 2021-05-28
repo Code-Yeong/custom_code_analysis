@@ -73,4 +73,7 @@
 - Add test cases
 
 ## 1.0.1-dev.6
+- Fix bugs
+
+## 1.2.0
 - Fix bugs                               
