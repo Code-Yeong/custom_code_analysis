@@ -67,4 +67,7 @@
 - Command line support
 
 ## 1.0.1-dev.4
-- Upgrade plugin version                               
+- Upgrade plugin version
+
+## 1.0.1-dev.5
+- Add test cases                               
