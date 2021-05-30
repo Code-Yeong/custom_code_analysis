@@ -83,3 +83,6 @@
 
 ## 1.2.0-dev.2
 - Migrate to null safety
+
+## 1.2.1
+- Fix bug
