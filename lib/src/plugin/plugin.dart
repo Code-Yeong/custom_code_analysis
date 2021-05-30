@@ -44,7 +44,7 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
   @override
   Future<plugin.PluginVersionCheckResult> handlePluginVersionCheck(plugin.PluginVersionCheckParams parameters) {
     logUtil.info('parameters = $parameters');
-    channel.sendNotification(plugin.PluginErrorParams(false,'customErroor', parameters.toString()).toNotification());
+    channel.sendNotification(plugin.PluginErrorParams(false, 'customErroor', parameters.toString()).toNotification());
     return super.handlePluginVersionCheck(parameters);
   }
 
@@ -77,7 +77,7 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
     runZonedGuarded(
       () {
         dartDriver.results.listen((analysisResult) {
-          logUtil.info('received analysis result from file: ${contextRoot.root}');
+          logUtil.info('received analysis result from file: ${analysisResult.libraryElement.source.fullName}');
           _processResult(dartDriver, analysisResult);
         });
       },
@@ -136,7 +136,9 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
         }
 
         List<Issue> issueList = [];
+        logUtil.info('globList = $globList, ruleList = ${AnalysisOptions.fromYamlMap(_yamlMap).rules}');
         for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules!) {
+          logUtil.info('ruleId = $ruleId');
           var rule = findRuleById(ruleId);
           if (rule != null) {
             issueList.addAll(rule.check(analysisResult));
