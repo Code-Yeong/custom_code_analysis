@@ -80,3 +80,6 @@
 
 ## 1.2.0-dev.1
 - Fix bugs                                  
+
+## 1.2.0-dev.2
+- Migrate to null safety
