@@ -7,6 +7,7 @@ import 'package:analyzer/src/context/builder.dart';
 import 'package:analyzer/src/context/context_root.dart' as analyzer;
 import 'package:analyzer/src/dart/analysis/driver.dart';
 import 'package:analyzer_plugin/plugin/plugin.dart';
+import 'package:analyzer_plugin/protocol/protocol.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
 import 'package:analyzer_plugin/protocol/protocol_generated.dart';
 import 'package:custom_code_analysis/src/logger/log.dart';
@@ -38,10 +39,14 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
   String get name => 'Custom Code Analysis';
 
   @override
-  String get version => '0.0.9';
+  String get version => '1.0.0';
 
   @override
-  bool isCompatibleWith(Version serverVersion) => true;
+  Future<plugin.PluginVersionCheckResult> handlePluginVersionCheck(plugin.PluginVersionCheckParams parameters) {
+    logUtil.info('parameters = $parameters');
+    channel.sendNotification(plugin.PluginErrorParams(false,'customErroor', parameters.toString()).toNotification());
+    return super.handlePluginVersionCheck(parameters);
+  }
 
   @override
   void contentChanged(String path) {
@@ -61,7 +66,13 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
       ..byteStore = byteStore
       ..performanceLog = performanceLog;
 
-    final dartDriver = contextBuilder.buildDriver(analysisRoot, null);
+    final workspace = ContextBuilder.createWorkspace(
+      resourceProvider: resourceProvider,
+      options: ContextBuilderOptions(),
+      rootPath: contextRoot.root,
+    );
+
+    final dartDriver = contextBuilder.buildDriver(analysisRoot, workspace);
     _sourceUri = _getSourceUri(dartDriver);
     runZonedGuarded(
       () {

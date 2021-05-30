@@ -89,3 +89,6 @@
 
 ## 1.2.2
 - Fix bug
+
+## 1.2.3-dev.1
+- Debug plugin
