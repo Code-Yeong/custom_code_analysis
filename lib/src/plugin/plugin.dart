@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/file_system/file_system.dart';
-import 'package:analyzer/src/analysis_options/analysis_options_provider.dart';
 import 'package:analyzer/src/context/builder.dart';
 import 'package:analyzer/src/context/context_root.dart' as analyzer;
 import 'package:analyzer/src/dart/analysis/driver.dart';
@@ -55,8 +54,8 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
 
   @override
   AnalysisDriverGeneric createAnalysisDriver(plugin.ContextRoot contextRoot) {
-    logUtil.info('createAnalysisDriver for: ${contextRoot.root}, ${p.absolute(contextRoot.root, analysisOptionsFileName)}');
-    _yamlMap = AnalysisOptionsProvider().getOptionsFromString(p.absolute(contextRoot.root, analysisOptionsFileName));
+    final analysisOptionsFile = io.File(p.absolute(contextRoot.root, analysisOptionsFileName));
+    _yamlMap = (loadYaml(analysisOptionsFile.readAsStringSync()) as YamlMap?)!;
     logUtil.info('_yamlMap = $_yamlMap');
     final analysisRoot = analyzer.ContextRoot(contextRoot.root, contextRoot.exclude, pathContext: resourceProvider.pathContext)
       ..optionsFilePath = contextRoot.optionsFile;
