@@ -55,7 +55,7 @@ class OverrideHashcodeMethod extends Rule {
 
     bool _isNotExist = node.members.every((item) {
       try {
-        return item.metadata.single.toString() != '@override' || (item.metadata.single.toString() == '@override' && item?.declaredElement?.name != 'hashCode');
+        return item.metadata.single.toString() != '@override' || (item.metadata.single.toString() == '@override' && item.declaredElement?.name != 'hashCode');
       } catch (e) {
         return true;
       }
@@ -73,7 +73,7 @@ class OverrideHashcodeMethod extends Rule {
       for (final item in node.members) {
         try {
           if (item.metadata.single.toString() == '@override') {
-            if (item?.declaredElement?.name == 'hashCode') {
+            if (item.declaredElement?.name == 'hashCode') {
               // print('item = ${item}');
             }
           }
@@ -110,7 +110,7 @@ String generateMessage(ClassDeclaration node, ResolvedUnitResult analysisResult)
   for (final item in node.members) {
     try {
       if (item.metadata.single.toString() == '@override') {
-        if (item?.declaredElement?.name == 'hashCode') {
+        if (item.declaredElement?.name == 'hashCode') {
           List<String> _missingFiledList = [];
           for (final obj in _filedNameList) {
             if (!item.toString().contains(obj)) {
@@ -157,7 +157,7 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
       for (final item in node.members) {
         try {
           if (item.metadata.single.toString() == '@override') {
-            if (item?.declaredElement?.name == 'hashCode') {
+            if (item.declaredElement?.name == 'hashCode') {
               _isNeedFix = _filedNameList.any((element) => !item.toString().contains(element));
             }
           }

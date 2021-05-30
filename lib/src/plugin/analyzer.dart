@@ -81,6 +81,6 @@ class CustomAnalyzer {
       ).toList();
 }
 
-Iterable<Glob> _prepareExcludes(Iterable<String> patterns) => patterns.map((exclude) => Glob(exclude)).toList() ?? [];
+Iterable<Glob> _prepareExcludes(Iterable<String> patterns) => patterns.map((exclude) => Glob(exclude)).toList();
 
 bool _isExcluded(String filePath, Iterable<Glob> excludes) => excludes.any((exclude) => exclude.matches(filePath));

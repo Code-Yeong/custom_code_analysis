@@ -9,7 +9,7 @@ class QLogger extends Logger {
   const QLogger(String name, [this.filePath]) : super(name, 'LoggerUtil');
 
   factory QLogger.createOutputToFile(String name, {String? filePath}) {
-    var logger = QLogger(name ?? 'Log', filePath);
+    var logger = QLogger(name, filePath);
     var fOutput = FileOutput(file: File(logger.filePath!));
     fOutput.init();
     var w = LogStreamWriter();

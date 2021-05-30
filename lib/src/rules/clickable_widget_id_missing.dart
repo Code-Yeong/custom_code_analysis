@@ -45,12 +45,12 @@ class ClickableWidgetIdMissing extends Rule {
     String? result;
 
     // 拿到原始文本内容
-    String? content = analysisResult?.content;
+    String? content = analysisResult.content;
 
     ClassElement? targetClazz;
     for(final lib in analysisResult.libraryElement.importedLibraries){
       for(final unit in lib.units){
-        targetClazz = unit.getType(node.constructorName.type?.name?.name);
+        targetClazz = unit.getType(node.constructorName.type.name.name);
         if(targetClazz != null){
           break;
         }
@@ -173,14 +173,14 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
 
     /// 判断是否被 @Clickable 标记
     for (final item in _metaData) {
-      if (item?.computeConstantValue()?.type?.getDisplayString(withNullability: false) == ClickableWidgetIdMissing.annotation) {
+      if (item.computeConstantValue()?.type?.getDisplayString(withNullability: false) == ClickableWidgetIdMissing.annotation) {
         _isTargetAnnotation = true;
         break;
       }
     }
 
     /// 判断是否是 ClickableWidget
-    if (node.constructorName.type?.name?.name == ClickableWidgetIdMissing.className) {
+    if (node.constructorName.type.name.name == ClickableWidgetIdMissing.className) {
       _isTargetAnnotation = true;
     }
 
