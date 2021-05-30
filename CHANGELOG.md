@@ -76,4 +76,7 @@
 - Fix bugs
 
 ## 1.2.0
-- Fix bugs                               
+- Fix bugs
+
+## 1.2.0-dev.1
+- Fix bugs                                  

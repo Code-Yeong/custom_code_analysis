@@ -38,7 +38,7 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
   String get name => 'Custom Code Analysis';
 
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.9';
 
   @override
   bool isCompatibleWith(Version serverVersion) => true;
