@@ -55,8 +55,9 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
 
   @override
   AnalysisDriverGeneric createAnalysisDriver(plugin.ContextRoot contextRoot) {
-    logUtil.info('createAnalysisDriver for: ${contextRoot.root}');
+    logUtil.info('createAnalysisDriver for: ${contextRoot.root}, ${p.absolute(contextRoot.root, analysisOptionsFileName)}');
     _yamlMap = AnalysisOptionsProvider().getOptionsFromString(p.absolute(contextRoot.root, analysisOptionsFileName));
+    logUtil.info('_yamlMap = $_yamlMap');
     final analysisRoot = analyzer.ContextRoot(contextRoot.root, contextRoot.exclude, pathContext: resourceProvider.pathContext)
       ..optionsFilePath = contextRoot.optionsFile;
 
