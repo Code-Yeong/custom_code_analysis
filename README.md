@@ -2,7 +2,7 @@
 1.Add dependency to `pubspec.yaml`
 ```
 dependencies:
-  custom_code_analysis: ^1.0.1-dev.1
+  custom_code_analysis: ^1.2.2
 ```
 2.Add configuration to `analysis_options.yaml`
 ```
