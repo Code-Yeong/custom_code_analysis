@@ -95,3 +95,6 @@
 
 ## 1.2.3-dev.2
 - Debug plugin
+
+## 1.2.3-dev.3
+- Debug plugin

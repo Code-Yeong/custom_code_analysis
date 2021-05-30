@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/file_system/file_system.dart';
@@ -7,20 +8,18 @@ import 'package:analyzer/src/context/builder.dart';
 import 'package:analyzer/src/context/context_root.dart' as analyzer;
 import 'package:analyzer/src/dart/analysis/driver.dart';
 import 'package:analyzer_plugin/plugin/plugin.dart';
-import 'package:analyzer_plugin/protocol/protocol.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
 import 'package:analyzer_plugin/protocol/protocol_generated.dart';
+import 'package:custom_code_analysis/src/configs/rule_config.dart';
 import 'package:custom_code_analysis/src/logger/log.dart';
+import 'package:custom_code_analysis/src/model/analysis_options.dart';
+import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/utils/issue_map_util.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
-import 'package:pub_semver/pub_semver.dart';
-import 'package:custom_code_analysis/src/configs/rule_config.dart';
-import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:yaml/yaml.dart';
 
 import '../model/analysis_options.dart';
-
 // class TestPlugin extends ServerPlugin with FixesMixin, DartFixesMixin {
 
 class CustomCodeAnalysisPlugin extends ServerPlugin {
@@ -57,7 +56,7 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
   @override
   AnalysisDriverGeneric createAnalysisDriver(plugin.ContextRoot contextRoot) {
     logUtil.info('createAnalysisDriver for: ${contextRoot.root}');
-    _yamlMap = AnalysisOptionsProvider().getOptionsFromString(contextRoot.optionsFile);
+    _yamlMap = AnalysisOptionsProvider().getOptionsFromString(p.absolute(contextRoot.root, analysisOptionsFileName));
     final analysisRoot = analyzer.ContextRoot(contextRoot.root, contextRoot.exclude, pathContext: resourceProvider.pathContext)
       ..optionsFilePath = contextRoot.optionsFile;
 
