@@ -104,3 +104,6 @@
 
 ## 1.2.3-dev.5
 - Debug plugin
+
+## 1.2.3-dev.6
+- Debug plugin

@@ -135,15 +135,16 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
         }
 
         List<Issue> issueList = [];
-        logUtil.info('globList = $globList, ruleList = ${AnalysisOptions.fromYamlMap(_yamlMap).rules}');
         for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules!) {
           logUtil.info('ruleId = $ruleId');
           var rule = findRuleById(ruleId);
           if (rule != null) {
             issueList.addAll(rule.check(analysisResult));
+            print('issueList =$issueList');
           }
         }
         if (issueList.isNotEmpty) {
+          logUtil.info('send Notification: ${issueList.length}');
           channel.sendNotification(
             plugin.AnalysisErrorsParams(
               analysisResult.path!,
