@@ -10,7 +10,7 @@ class AvoidUsingColors extends Rule {
   AvoidUsingColors(String ruleId) : super(ruleId: ruleId);
 
   @override
-  String get code => ruleId;
+  String? get code => ruleId;
 
   @override
   String get comment => '快速添加';
@@ -27,22 +27,22 @@ class AvoidUsingColors extends Rule {
   @override
   Iterable<Issue> check(ResolvedUnitResult analysisResult) {
     final visitor = ColorsCodeIssueVisitor(analysisResult: analysisResult, rule: this);
-    analysisResult.unit.accept(visitor);
+    analysisResult.unit!.accept(visitor);
     return visitor.nodes
         .map((node) => Issue(
               errorSeverity: AnalysisErrorSeverity.INFO,
               errorType: AnalysisErrorType.HINT,
               offset: node.offset,
               length: node.length,
-              line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
-              endLine: analysisResult.unit.lineInfo.getLocation(node.end).lineNumber,
-              endColumn: analysisResult.unit.lineInfo.getLocation(node.end).columnNumber,
+              line: analysisResult.unit!.lineInfo!.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit!.lineInfo!.getLocation(node.offset).columnNumber,
+              endLine: analysisResult.unit!.lineInfo!.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit!.lineInfo!.getLocation(node.end).columnNumber,
               message: message,
               code: code,
               correction: correction,
               hasFix: false,
-              filePath: analysisResult.unit.declaredElement.source.fullName,
+              filePath: analysisResult.unit!.declaredElement!.source.fullName,
             ))
         .toList();
   }
@@ -50,8 +50,8 @@ class AvoidUsingColors extends Rule {
 
 class ColorsCodeIssueVisitor extends RecursiveAstVisitor<void> {
   final _nodes = <AstNode>[];
-  final ResolvedUnitResult analysisResult;
-  final Rule rule;
+  final ResolvedUnitResult? analysisResult;
+  final Rule? rule;
 
   ColorsCodeIssueVisitor({this.analysisResult, this.rule});
 
@@ -59,10 +59,10 @@ class ColorsCodeIssueVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (node.name == rule.methodName) {
-      int lineNumber = analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber;
-      var ignoreInfo = IgnoreInfo.forDart(analysisResult.unit, analysisResult.content);
-      if (!ignoreInfo.ignoredAt(rule.code.replaceAll('-', '_'), lineNumber)) {
+    if (node.name == rule!.methodName) {
+      int lineNumber = analysisResult!.unit!.lineInfo!.getLocation(node.offset).lineNumber;
+      var ignoreInfo = IgnoreInfo.forDart(analysisResult!.unit!, analysisResult!.content!);
+      if (!ignoreInfo.ignoredAt(rule!.code!.replaceAll('-', '_'), lineNumber)) {
         _nodes.add(node);
       }
     }

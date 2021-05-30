@@ -30,10 +30,10 @@ Map<String, Rule> registeredRulesMap = {
   'override-hash-code-method': OverrideHashcodeMethod('override-hash-code-method'),
 };
 
-Rule findRuleById(String ruleId) {
+Rule? findRuleById(String ruleId) {
   return registeredRulesMap[ruleId];
 }
 
-List<Rule> getRulesById(List<String> rulesId) {
+List<Rule?> getRulesById(List<String> rulesId) {
   return rulesId.map((id) => registeredRulesMap[id]).toList();
 }

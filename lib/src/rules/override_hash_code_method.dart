@@ -10,7 +10,7 @@ class OverrideHashcodeMethod extends Rule {
   OverrideHashcodeMethod(String ruleId) : super(ruleId: ruleId);
 
   @override
-  String get code => ruleId;
+  String? get code => ruleId;
 
   @override
   String get comment => '快速修复';
@@ -27,7 +27,7 @@ class OverrideHashcodeMethod extends Rule {
   @override
   Iterable<Issue> check(ResolvedUnitResult analysisResult) {
     final visitor = _MirrorVisitor(analysisResult, this);
-    analysisResult.unit.accept(visitor);
+    analysisResult.unit!.accept(visitor);
 
     return visitor.nodes
         .map((node) => Issue(
@@ -35,17 +35,17 @@ class OverrideHashcodeMethod extends Rule {
               errorType: AnalysisErrorType.HINT,
               offset: node.offset,
               length: node.length,
-              line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
-              endLine: analysisResult.unit.lineInfo.getLocation(node.end).lineNumber,
-              endColumn: analysisResult.unit.lineInfo.getLocation(node.end).columnNumber,
+              line: analysisResult.unit!.lineInfo!.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit!.lineInfo!.getLocation(node.offset).columnNumber,
+              endLine: analysisResult.unit!.lineInfo!.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit!.lineInfo!.getLocation(node.end).columnNumber,
               // message: message,
-              message: generateMessage(node, analysisResult),
+              message: generateMessage(node as ClassDeclaration, analysisResult),
               code: code,
               correction: generateMessage(node, analysisResult),
               replacement: generateReplacement(node, analysisResult),
               hasFix: false,
-              filePath: analysisResult.unit.declaredElement.source.fullName,
+              filePath: analysisResult.unit!.declaredElement!.source.fullName,
             ))
         .toList();
   }
@@ -64,7 +64,7 @@ class OverrideHashcodeMethod extends Rule {
       List<String> _filedNameList = [];
       for (final obj in node.members) {
         if (obj.beginToken.lexeme == 'final') {
-          _filedNameList.add('${obj.endToken.previous.lexeme}.hashCode');
+          _filedNameList.add('${obj.endToken.previous!.lexeme}.hashCode');
         }
       }
       fixStr = 'int get hashCode => ${_filedNameList.join(' ^ ')};';
@@ -103,7 +103,7 @@ String generateMessage(ClassDeclaration node, ResolvedUnitResult analysisResult)
   List<String> _filedNameList = [];
   for (final obj in node.members) {
     if (obj.beginToken.lexeme == 'final') {
-      _filedNameList.add('${obj.endToken.previous.lexeme}.hashCode');
+      _filedNameList.add('${obj.endToken.previous!.lexeme}.hashCode');
     }
   }
 
@@ -138,11 +138,11 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
-    String superClassName = node.declaredElement.supertype.getDisplayString(withNullability: false);
+    String superClassName = node.declaredElement!.supertype!.getDisplayString(withNullability: false);
     if (superClassName != null && superClassName == 'ReduxViewModel') {
-      int lineNumber = analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber;
-      var ignoreInfo = IgnoreInfo.forDart(analysisResult.unit, analysisResult.content);
-      if (ignoreInfo.ignoredAt(rule.ruleId.replaceAll('-', '_'), lineNumber)) {
+      int lineNumber = analysisResult.unit!.lineInfo!.getLocation(node.offset).lineNumber;
+      var ignoreInfo = IgnoreInfo.forDart(analysisResult.unit!, analysisResult.content!);
+      if (ignoreInfo.ignoredAt(rule.ruleId!.replaceAll('-', '_'), lineNumber)) {
         return;
       }
       bool _isNeedFix = true;
@@ -150,7 +150,7 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
       List<String> _filedNameList = [];
       for (final obj in node.members) {
         if (obj.beginToken.lexeme == 'final') {
-          _filedNameList.add('${obj.endToken.previous.lexeme}.hashCode');
+          _filedNameList.add('${obj.endToken.previous!.lexeme}.hashCode');
         }
       }
 

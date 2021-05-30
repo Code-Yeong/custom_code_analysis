@@ -28,9 +28,9 @@ Future<void> main(List<String> args) async {
     await _runAnalysis(
       arguments[rootFolderName] as String,
       arguments.rest,
-      arguments[reporterName] as String,
-      arguments[verboseName] as bool,
-      arguments[gitlabCompatibilityName] as bool,
+      arguments[reporterName] as String?,
+      arguments[verboseName] as bool?,
+      arguments[gitlabCompatibilityName] as bool?,
     );
   } on Exception catch (e) {
     print('$e\n');
@@ -47,15 +47,15 @@ void _showUsageAndExit(int exitCode) {
 Future<void> _runAnalysis(
   String rootFolder,
   Iterable<String> analysisDirectories,
-  String reporterType,
-  bool verbose,
-  bool gitlab,
+  String? reporterType,
+  bool? verbose,
+  bool? gitlab,
 ) async {
   final analysisOptionsFile = File(p.absolute(rootFolder, analysisOptionsFileName));
-  var _yamlMap = loadYaml(analysisOptionsFile.readAsStringSync()) as YamlMap;
+  var _yamlMap = loadYaml(analysisOptionsFile.readAsStringSync()) as YamlMap?;
 
   final options = analysisOptionsFile.existsSync()
-      ? await AnalysisOptions.fromYamlMap(_yamlMap)
+      ? await AnalysisOptions.fromYamlMap(_yamlMap!)
       : AnalysisOptions(
           excludes: [],
           rules: [],
@@ -66,7 +66,7 @@ Future<void> _runAnalysis(
   final analyzer = CustomAnalyzer(config, store);
   await analyzer.runAnalysis(analysisDirectories, rootFolder);
   // print('reporterType = $reporterType');
-  Reporter reporter;
+  late Reporter reporter;
 
   switch (reporterType) {
     case 'console':

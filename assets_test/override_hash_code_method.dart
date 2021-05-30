@@ -4,9 +4,9 @@ import 'widgets.dart';
 class ClazzPicture extends ReduxViewModel {
   ClazzPicture({this.height, this.width, this.picture});
 
-  final String picture;
-  final int width;
-  final int height;
+  final String? picture;
+  final int? width;
+  final int? height;
 
   @override
   bool operator ==(Object other) =>
@@ -21,26 +21,26 @@ class ClazzPicture extends ReduxViewModel {
 class ClazzBook extends ReduxViewModel {
   ClazzBook({this.height, this.width, this.picture});
 
-  final String picture;
-  final int width;
-  final int height;
+  final String? picture;
+  final int? width;
+  final int? height;
 }
 
 // ignore: override_hash_code_method
 class ClazzCar extends ReduxViewModel {
   ClazzCar({this.height, this.width, this.picture});
 
-  final String picture;
-  final int width;
-  final int height;
+  final String? picture;
+  final int? width;
+  final int? height;
 }
 
 class ClazzHouse extends ReduxViewModel {
   ClazzHouse({this.height, this.width, this.picture});
 
-  final String picture;
-  final int width;
-  final int height;
+  final String? picture;
+  final int? width;
+  final int? height;
 
   @override
   bool operator ==(Object other) =>

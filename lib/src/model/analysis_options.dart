@@ -8,7 +8,7 @@ const _rulesKey = 'rules';
 
 class AnalysisOptions {
   static AnalysisOptions fromYamlMap(YamlMap yamlMap) {
-    YamlMap map = yamlMap[_rootKey];
+    YamlMap? map = yamlMap[_rootKey];
     if(map == null){
       return AnalysisOptions(
         rules: [],
@@ -23,6 +23,6 @@ class AnalysisOptions {
 
   AnalysisOptions({this.excludes, this.rules});
 
-  final List<String> excludes;
-  final List<String> rules;
+  final List<String>? excludes;
+  final List<String>? rules;
 }

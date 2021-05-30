@@ -4,12 +4,12 @@ import 'package:meta/meta.dart';
 /// Class representing config
 @immutable
 class Config {
-  final Iterable<String> excludePatterns;
-  final Iterable<String> rules;
+  final Iterable<String>? excludePatterns;
+  final Iterable<String>? rules;
 
   const Config({
-    @required this.excludePatterns,
-    @required this.rules,
+    required this.excludePatterns,
+    required this.rules,
   });
 
   factory Config.fromAnalysisOptions(AnalysisOptions options) {

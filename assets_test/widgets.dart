@@ -1,12 +1,12 @@
 class ClickableWidget {
-  final String uuid;
-  final String name;
+  final String? uuid;
+  final String? name;
 
   ClickableWidget({this.uuid, this.name});
 }
 
 class Clickable {
-  final String message;
+  final String? message;
 
   const Clickable({this.message});
 }
@@ -15,11 +15,11 @@ class Clickable {
 class RoundButton {
   RoundButton({this.name, this.uuid, this.testUuid});
 
-  final String name;
-  final String uuid;
-  final String testUuid;
+  final String? name;
+  final String? uuid;
+  final String? testUuid;
 
-  factory RoundButton.circle({String uuid, String name, String testUuid}) {
+  factory RoundButton.circle({String? uuid, String? name, String? testUuid}) {
     return RoundButton(uuid: uuid);
   }
 }
@@ -38,7 +38,7 @@ class Color extends BaseColor {
 class MockWidget {
   MockWidget({this.color});
 
-  final BaseColor color;
+  final BaseColor? color;
 }
 
 void showModalBottomSheet() {}

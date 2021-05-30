@@ -10,14 +10,14 @@ import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart';
 import 'package:yaml/yaml.dart';
 
-List<String> excludedFilesFromAnalysisOptions(File analysisOptions) {
+List<String?> excludedFilesFromAnalysisOptions(File analysisOptions) {
   final parsedOptions = loadYaml(analysisOptions.readAsStringSync()) as YamlMap;
   final analyzerSection = parsedOptions.nodes['analyzer'];
   if (analysisOptions != null) {
     final dynamic excludedSection = (analyzerSection as YamlMap)['exclude'];
     if (excludedSection != null) {
       // ignore: avoid_annotating_with_dynamic
-      return (excludedSection as YamlList).map((dynamic path) => path as String).toList();
+      return (excludedSection as YamlList).map((dynamic path) => path as String?).toList();
     }
   }
   return [];
@@ -66,19 +66,19 @@ String readableAnalysisError(AnalysisError analysisError) => analysisError.toRea
 
 AnalysisError codeIssueToAnalysisError(Issue issue, ResolvedUnitResult analysisResult) {
   return AnalysisError(
-    issue.errorSeverity,
-    issue.errorType,
+    issue.errorSeverity!,
+    issue.errorType!,
     Location(
-      analysisResult.unit.declaredElement.source.fullName,
-      issue.offset,
-      issue.length,
-      issue.line,
-      issue.column,
-      issue.endLine,
-      issue.endColumn,
+      analysisResult.unit!.declaredElement!.source.fullName,
+      issue.offset!,
+      issue.length!,
+      issue.line!,
+      issue.column!,
+      issue.endLine!,
+      issue.endColumn!,
     ),
-    issue.message,
-    issue.code,
+    issue.message!,
+    issue.code!,
     correction: issue.correction,
     hasFix: issue.hasFix,
   );

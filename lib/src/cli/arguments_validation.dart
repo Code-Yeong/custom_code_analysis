@@ -20,10 +20,10 @@ void checkPathsToAnalyzeNotEmpty(ArgResults arguments) {
 }
 
 void checkPathsExistAndDirectories(ArgResults arguments) {
-  final rootFolderPath = arguments[rootFolderName] as String;
+  final rootFolderPath = arguments[rootFolderName] as String?;
 
   for (final relativePath in arguments.rest) {
-    final absolutePath = path.join(rootFolderPath, relativePath);
+    final absolutePath = path.join(rootFolderPath!, relativePath);
     if (!Directory(absolutePath).existsSync()) {
 
     }

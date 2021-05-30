@@ -18,7 +18,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('clickable-widget-uuid-missing');
+    Rule _codeRule = findRuleById('clickable-widget-uuid-missing')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 8);
@@ -33,7 +33,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-color');
+    Rule _codeRule = findRuleById('avoid-using-color')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 2);
@@ -48,7 +48,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-colors');
+    Rule _codeRule = findRuleById('avoid-using-colors')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 3);
@@ -63,7 +63,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-show-bottom-modal-sheet');
+    Rule _codeRule = findRuleById('avoid-using-show-bottom-modal-sheet')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 1);
@@ -78,7 +78,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-show-bottom-sheet');
+    Rule _codeRule = findRuleById('avoid-using-show-bottom-sheet')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 1);
@@ -93,7 +93,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-show-date-picker');
+    Rule _codeRule = findRuleById('avoid-using-show-date-picker')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 1);
@@ -108,7 +108,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-show-date-range-picker');
+    Rule _codeRule = findRuleById('avoid-using-show-date-range-picker')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 1);
@@ -123,7 +123,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-show-dialog');
+    Rule _codeRule = findRuleById('avoid-using-show-dialog')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 1);
@@ -138,7 +138,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-show-general-dialog');
+    Rule _codeRule = findRuleById('avoid-using-show-general-dialog')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 1);
@@ -153,7 +153,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-show-menu');
+    Rule _codeRule = findRuleById('avoid-using-show-menu')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 1);
@@ -168,7 +168,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-show-search');
+    Rule _codeRule = findRuleById('avoid-using-show-search')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 1);
@@ -183,7 +183,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('avoid-using-show-time-picker');
+    Rule _codeRule = findRuleById('avoid-using-show-time-picker')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 1);
@@ -198,7 +198,7 @@ void main() {
     );
     final normalizedPath = normalize(filePath);
     ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('override-hash-code-method');
+    Rule _codeRule = findRuleById('override-hash-code-method')!;
     var resultList = _codeRule.check(unit);
     // print(resultList);
     expect(resultList.length, 2);

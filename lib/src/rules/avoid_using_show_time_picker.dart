@@ -4,7 +4,7 @@ class AvoidUsingShowTimePicker extends Rule {
   AvoidUsingShowTimePicker(String ruleId) : super(ruleId: ruleId);
 
   @override
-  String get code => ruleId;
+  String? get code => ruleId;
 
   @override
   String get comment => '快速添加';

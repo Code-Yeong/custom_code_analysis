@@ -19,23 +19,23 @@ class Issue {
     this.filePath,
   });
 
-  final bool hasFix;
+  final bool? hasFix;
 
-  final int offset;
-  final int length;
-  final int line;
-  final int endLine;
-  final int column;
-  final int endColumn;
-  final String message;
-  final String code;
-  final String correction;
-  final String comment;
-  final String replacement;
-  final String filePath;
+  final int? offset;
+  final int? length;
+  final int? line;
+  final int? endLine;
+  final int? column;
+  final int? endColumn;
+  final String? message;
+  final String? code;
+  final String? correction;
+  final String? comment;
+  final String? replacement;
+  final String? filePath;
 
-  final AnalysisErrorSeverity errorSeverity;
-  final AnalysisErrorType errorType;
+  final AnalysisErrorSeverity? errorSeverity;
+  final AnalysisErrorType? errorType;
 
   @override
   String toString() {

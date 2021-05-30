@@ -19,13 +19,13 @@ import 'package:path/path.dart' as p;
 // @Deprecated('will be replaced with LintAnalyzer in 4.0')
 class CustomAnalyzer {
   final Iterable<Glob> _globalExclude;
-  final Iterable<Rule> _codeRules;
+  final Iterable<Rule?> _codeRules;
 
   final CustomAnalyzerStore _store;
 
   CustomAnalyzer(Config config, CustomAnalyzerStore store)
-      : _globalExclude = _prepareExcludes(config.excludePatterns),
-        _codeRules = getRulesById(config.rules),
+      : _globalExclude = _prepareExcludes(config.excludePatterns!),
+        _codeRules = getRulesById(config.rules as List<String>),
         _store = store;
 
   /// Return a future that will complete after static analysis done for files from [folders].
@@ -67,7 +67,7 @@ class CustomAnalyzer {
 
       /// 记录结果
       var resultList = _checkOnCodeIssues(filePath, rootFolder, result);
-      _store.storeAll(resultList);
+      _store.storeAll(resultList as List<Issue>);
     }
   }
 
@@ -77,7 +77,7 @@ class CustomAnalyzer {
     ResolvedUnitResult analysisResult,
   ) =>
       _codeRules.expand(
-        (rule) => rule.check(analysisResult),
+        (rule) => rule!.check(analysisResult),
       ).toList();
 }
 

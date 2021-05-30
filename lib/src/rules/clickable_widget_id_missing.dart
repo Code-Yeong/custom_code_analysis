@@ -15,7 +15,7 @@ class ClickableWidgetIdMissing extends Rule {
   ClickableWidgetIdMissing(String ruleId) : super(ruleId: ruleId);
 
   @override
-  String get code => ruleId;
+  String? get code => ruleId;
 
   @override
   String get comment => '快速添加';
@@ -27,14 +27,14 @@ class ClickableWidgetIdMissing extends Rule {
   String get message => '$className缺少$requiredField参数';
 
   @override
-  String get methodName => null;
+  String? get methodName => null;
 
   static const annotation = 'Clickable';
   static const className = 'ClickableWidget';
   static const requiredField = 'uuid';
 
   int _getLineNumber(Token token, ResolvedUnitResult analysisResult) {
-    return analysisResult.unit.lineInfo.getLocation(token.offset).lineNumber;
+    return analysisResult.unit!.lineInfo!.getLocation(token.offset).lineNumber;
   }
 
   String _generateReplacement(InstanceCreationExpression node, ResolvedUnitResult analysisResult) {
@@ -42,12 +42,12 @@ class ClickableWidgetIdMissing extends Rule {
     // 获取参数列表
     var argumentList = node.argumentList.arguments;
 
-    String result;
+    String? result;
 
     // 拿到原始文本内容
-    String content = analysisResult?.content;
+    String? content = analysisResult?.content;
 
-    ClassElement targetClazz;
+    ClassElement? targetClazz;
     for(final lib in analysisResult.libraryElement.importedLibraries){
       for(final unit in lib.units){
         targetClazz = unit.getType(node.constructorName.type?.name?.name);
@@ -66,10 +66,10 @@ class ClickableWidgetIdMissing extends Rule {
         String _randomId = Uuid().v4().toString().replaceAll('-', '');
         if (left == right) {
           result =
-              '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.leftParenthesis.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
+              '${node.constructorName}${content!.substring(node.argumentList.leftParenthesis.offset, node.argumentList.leftParenthesis.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
         } else {
           result =
-              '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
+              '${node.constructorName}${content!.substring(node.argumentList.leftParenthesis.offset, node.argumentList.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
         }
       }
     }
@@ -110,7 +110,7 @@ class ClickableWidgetIdMissing extends Rule {
       }
     }
 
-    String _originSource = content.substring(node.argumentList.offset, node.argumentList.end);
+    String _originSource = content!.substring(node.argumentList.offset, node.argumentList.end);
 
     for (final obj in expressionList) {
       String _p1 = '${obj.beginToken.lexeme}: ${obj.endToken.lexeme}';
@@ -132,22 +132,22 @@ class ClickableWidgetIdMissing extends Rule {
   @override
   List<Issue> check(ResolvedUnitResult analysisResult) {
     final visitor = _ParameterVisitor(analysisResult: analysisResult, rule: this);
-    analysisResult.unit.accept(visitor);
+    analysisResult.unit!.accept(visitor);
     return visitor.nodes
         .map((node) => Issue(
               errorSeverity: AnalysisErrorSeverity.INFO,
               errorType: AnalysisErrorType.HINT,
               offset: node.offset,
               length: node.length,
-              line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
+              line: analysisResult.unit!.lineInfo!.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit!.lineInfo!.getLocation(node.offset).columnNumber,
               message: message,
               code: code,
               comment: comment,
               correction: correction,
               replacement: _generateReplacement(node, analysisResult),
               hasFix: false,
-              filePath: analysisResult.unit.declaredElement.source.fullName,
+              filePath: analysisResult.unit!.declaredElement!.source.fullName,
             ))
         .toList();
   }
@@ -156,8 +156,8 @@ class ClickableWidgetIdMissing extends Rule {
 class _ParameterVisitor extends GeneralizingAstVisitor<void> {
   _ParameterVisitor({this.rule, this.analysisResult});
 
-  final ResolvedUnitResult analysisResult;
-  final Rule rule;
+  final ResolvedUnitResult? analysisResult;
+  final Rule? rule;
 
   final _nodes = <InstanceCreationExpression>[];
 
@@ -165,11 +165,11 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    var _metaData = node.staticType.element.metadata;
+    var _metaData = node.staticType!.element!.metadata;
     bool _isTargetAnnotation = false;
 
-    int lineNumber = analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber;
-    var ignoreInfo = IgnoreInfo.forDart(analysisResult.unit, analysisResult.content);
+    int lineNumber = analysisResult!.unit!.lineInfo!.getLocation(node.offset).lineNumber;
+    var ignoreInfo = IgnoreInfo.forDart(analysisResult!.unit!, analysisResult!.content!);
 
     /// 判断是否被 @Clickable 标记
     for (final item in _metaData) {
@@ -185,7 +185,7 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
     }
 
     /// 判断是否忽略
-    if (ignoreInfo.ignoredAt(rule.code.replaceAll('-', '_'), lineNumber)) {
+    if (ignoreInfo.ignoredAt(rule!.code!.replaceAll('-', '_'), lineNumber)) {
       _isTargetAnnotation = false;
     }
 

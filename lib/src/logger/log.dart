@@ -4,13 +4,13 @@ import "package:path/path.dart" as p;
 import 'package:quick_log/quick_log.dart';
 
 class QLogger extends Logger {
-  final String filePath;
+  final String? filePath;
 
   const QLogger(String name, [this.filePath]) : super(name, 'LoggerUtil');
 
-  factory QLogger.createOutputToFile(String name, {String filePath}) {
+  factory QLogger.createOutputToFile(String name, {String? filePath}) {
     var logger = QLogger(name ?? 'Log', filePath);
-    var fOutput = FileOutput(file: File(logger.filePath));
+    var fOutput = FileOutput(file: File(logger.filePath!));
     fOutput.init();
     var w = LogStreamWriter();
     Logger.writer = w;
@@ -22,10 +22,10 @@ class QLogger extends Logger {
 }
 
 class FileOutput {
-  final File file;
+  final File? file;
   final bool overrideExisting;
   final Encoding encoding;
-  IOSink _sink;
+  late IOSink _sink;
 
   FileOutput({
     this.file,
@@ -34,7 +34,7 @@ class FileOutput {
   });
 
   void init() {
-    _sink = file.openWrite(
+    _sink = file!.openWrite(
       mode: overrideExisting ? FileMode.writeOnly : FileMode.writeOnlyAppend,
       encoding: encoding,
     );
@@ -63,8 +63,8 @@ Future<void> writeAFile(String path) async {
   await sink.close();
 }
 
-String get homePath {
-  String home = "";
+String? get homePath {
+  String? home = "";
   Map<String, String> envVars = Platform.environment;
   if (Platform.isMacOS) {
     home = envVars['HOME'];

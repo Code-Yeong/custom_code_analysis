@@ -6,8 +6,8 @@ import '../model/rule.dart';
 
 class CodeIssueVisitor extends RecursiveAstVisitor<void> {
   final _nodes = <AstNode>[];
-  final ResolvedUnitResult analysisResult;
-  final Rule rule;
+  final ResolvedUnitResult? analysisResult;
+  final Rule? rule;
 
   CodeIssueVisitor({this.analysisResult, this.rule});
 
@@ -16,10 +16,10 @@ class CodeIssueVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     node.visitChildren(this);
-    if (node.methodName.name == rule.methodName) {
-      int lineNumber = analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber;
-      var ignoreInfo = IgnoreInfo.forDart(analysisResult.unit, analysisResult.content);
-      if (!ignoreInfo.ignoredAt(rule.code.replaceAll('-', '_'), lineNumber)) {
+    if (node.methodName.name == rule!.methodName) {
+      int lineNumber = analysisResult!.unit!.lineInfo!.getLocation(node.offset).lineNumber;
+      var ignoreInfo = IgnoreInfo.forDart(analysisResult!.unit!, analysisResult!.content!);
+      if (!ignoreInfo.ignoredAt(rule!.code!.replaceAll('-', '_'), lineNumber)) {
         _nodes.add(node);
       }
     }

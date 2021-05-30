@@ -27,9 +27,9 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
 
   var _filesFromSetPriorityFilesRequest = <String>[];
 
-  YamlMap _yamlMap;
+  late YamlMap _yamlMap;
 
-  String _sourceUri;
+  String? _sourceUri;
 
   @override
   List<String> get fileGlobsToAnalyze => <String>['**/*.dart'];
@@ -45,7 +45,7 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
 
   @override
   void contentChanged(String path) {
-    AnalysisDriverGeneric driver = super.driverForPath(path);
+    AnalysisDriverGeneric driver = super.driverForPath(path)!;
     driver.addFile(path);
   }
 
@@ -92,7 +92,7 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
       ..._filesFromSetPriorityFilesRequest,
       for (final driver2 in driverMap.values) ...(driver2 as AnalysisDriver).addedFiles,
     };
-    final filesByDriver = <AnalysisDriverGeneric, List<String>>{};
+    final filesByDriver = <AnalysisDriverGeneric?, List<String>>{};
     for (final file in filesToFullyResolve) {
       final contextRoot = contextRootContaining(file);
       if (contextRoot != null) {
@@ -100,16 +100,16 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
         filesByDriver.putIfAbsent(driver, () => <String>[]).add(file);
       }
     }
-    filesByDriver.forEach((driver, files) => driver.priorityFiles = files);
+    filesByDriver.forEach((driver, files) => driver!.priorityFiles = files);
   }
 
-  String _getSourceUri(AnalysisDriver dartDriver) {
-    String _uri;
+  String? _getSourceUri(AnalysisDriver dartDriver) {
+    String? _uri;
     // ignore: deprecated_member_use
-    String _optionsFile = dartDriver.contextRoot.optionsFilePath;
+    String? _optionsFile = dartDriver.contextRoot!.optionsFilePath;
     if (_optionsFile != null) {
       // ignore: deprecated_member_use
-      _uri = dartDriver.resourceProvider.pathContext.dirname(dartDriver.contextRoot.optionsFilePath);
+      _uri = dartDriver.resourceProvider.pathContext.dirname(dartDriver.contextRoot!.optionsFilePath!);
     }
     return _uri;
   }
@@ -117,15 +117,15 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
   void _processResult(AnalysisDriver driver, ResolvedUnitResult analysisResult) {
     try {
       if (analysisResult.unit != null && analysisResult.libraryElement != null) {
-        String _fullName = analysisResult.unit.declaredElement.source.fullName;
+        String _fullName = analysisResult.unit!.declaredElement!.source.fullName;
 
-        var globList = AnalysisOptions.fromYamlMap(_yamlMap).excludes.map((e) => Glob(p.join(_sourceUri, e))).toList();
+        var globList = AnalysisOptions.fromYamlMap(_yamlMap).excludes!.map((e) => Glob(p.join(_sourceUri!, e))).toList();
         if (globList.any((glob) => glob.matches(_fullName))) {
           return;
         }
 
         List<Issue> issueList = [];
-        for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules) {
+        for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules!) {
           var rule = findRuleById(ruleId);
           if (rule != null) {
             issueList.addAll(rule.check(analysisResult));
@@ -134,15 +134,15 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
         if (issueList.isNotEmpty) {
           channel.sendNotification(
             plugin.AnalysisErrorsParams(
-              analysisResult.path,
+              analysisResult.path!,
               issueList.map((issue) => codeIssueToAnalysisError(issue, analysisResult)).toList(),
             ).toNotification(),
           );
         } else {
-          channel.sendNotification(plugin.AnalysisErrorsParams(analysisResult.path, []).toNotification());
+          channel.sendNotification(plugin.AnalysisErrorsParams(analysisResult.path!, []).toNotification());
         }
       } else {
-        channel.sendNotification(plugin.AnalysisErrorsParams(analysisResult.path, []).toNotification());
+        channel.sendNotification(plugin.AnalysisErrorsParams(analysisResult.path!, []).toNotification());
       }
     } on Exception catch (e, stackTrace) {
       channel.sendNotification(plugin.PluginErrorParams(false, e.toString(), stackTrace.toString()).toNotification());
@@ -156,10 +156,10 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
       final analysisResult = await driver.getResult(parameters.file);
 
       List<AnalysisErrorFixes> errorFixes = [];
-      for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules) {
+      for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules!) {
         var rule = findRuleById(ruleId);
         if (rule != null) {
-          errorFixes.addAll(codeIssueToAnalysisErrorFixes(rule.check(analysisResult), analysisResult));
+          errorFixes.addAll(codeIssueToAnalysisErrorFixes(rule.check(analysisResult) as List<Issue>, analysisResult));
         }
       }
 

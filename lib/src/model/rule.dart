@@ -9,29 +9,29 @@ abstract class Rule {
 
   Iterable<Issue> check(ResolvedUnitResult analysisResult) {
     final visitor = CodeIssueVisitor(analysisResult: analysisResult, rule: this);
-    analysisResult.unit.accept(visitor);
+    analysisResult.unit!.accept(visitor);
     return visitor.nodes
         .map((node) => Issue(
               errorSeverity: AnalysisErrorSeverity.INFO,
               errorType: AnalysisErrorType.HINT,
               offset: node.offset,
               length: node.length,
-              line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
-              endLine: analysisResult.unit.lineInfo.getLocation(node.end).lineNumber,
-              endColumn: analysisResult.unit.lineInfo.getLocation(node.end).columnNumber,
+              line: analysisResult.unit!.lineInfo!.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit!.lineInfo!.getLocation(node.offset).columnNumber,
+              endLine: analysisResult.unit!.lineInfo!.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit!.lineInfo!.getLocation(node.end).columnNumber,
               message: message,
               code: code,
               correction: correction,
               hasFix: false,
-              filePath: analysisResult.unit.declaredElement.source.fullName,
+              filePath: analysisResult.unit!.declaredElement!.source.fullName,
             ))
         .toList();
   }
 
-  final String ruleId;
+  final String? ruleId;
 
-  String get code;
+  String? get code;
 
   String get correction;
 
@@ -39,5 +39,5 @@ abstract class Rule {
 
   String get comment;
 
-  String get methodName;
+  String? get methodName;
 }
