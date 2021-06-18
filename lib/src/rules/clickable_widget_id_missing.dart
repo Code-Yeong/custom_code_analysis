@@ -161,15 +161,15 @@ class ClickableWidgetIdMissing extends Rule {
 
     if (argumentList.isEmpty) {
       /// 参数列表为空，肯定没有uuid，需要修复
-      message = '没有uuid';
-    } else if (argumentList.map((e) => e.beginToken.lexeme).toList().every((element) => !element.endsWith('uuid'))) {
-      /// 没有找到任何以uuid结尾的字段名
       message = '参数列表为空，缺少uuid';
+    } else if (argumentList.map((e) => e.beginToken.lexeme).toList().every((element) => !element.toLowerCase().endsWith('uuid'))) {
+      /// 没有找到任何以uuid结尾的字段名
+      message = 'uuid变量未初始化';
     } else {
       /// 遍历每一个属性
       for (final item in argumentList) {
         /// 属性名以 uuid 或 Uuid 结尾
-        bool _hasFindTargetField = item.beginToken.lexeme.endsWith('uuid') || item.beginToken.lexeme.endsWith('Uuid');
+        bool _hasFindTargetField = item.beginToken.lexeme.toLowerCase().endsWith('uuid');
 
         /// 属性值等于 null|'null'|''|' '
         bool _isInValidValue = item.endToken.lexeme == null ||
@@ -240,14 +240,14 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
       if (argumentList.isEmpty) {
         /// 参数列表为空，肯定没有uuid，需要修复
         _isNeedFix = true;
-      } else if (argumentList.map((e) => e.beginToken.lexeme).toList().every((element) => !element.endsWith('uuid'))) {
+      } else if (argumentList.map((e) => e.beginToken.lexeme).toList().every((element) => !element.toLowerCase().endsWith('uuid'))) {
         /// 没有找到任何以uuid结尾的字段名
         _isNeedFix = true;
       } else {
         /// 遍历每一个属性
         for (final item in argumentList) {
           /// 属性名以 uuid 或 Uuid 结尾
-          bool _hasFindTargetField = item.beginToken.lexeme.endsWith('uuid') || item.beginToken.lexeme.endsWith('Uuid');
+          bool _hasFindTargetField = item.beginToken.lexeme.toLowerCase().endsWith('uuid');
 
           /// 属性值等于 null|'null'|''|' '
           bool _isInValidValue = item.endToken.lexeme == null ||
@@ -266,8 +266,13 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
               _isNeedFix = true;
             } else {
               /// uuid不重复，加入列表中记录下来
-              existIdList.add(item.endToken.lexeme);
+              if(!item.endToken.lexeme.toLowerCase().contains('uuid')) {
+                existIdList.add(item.endToken.lexeme);
+              }
             }
+          }
+          if(_isNeedFix){
+            break;
           }
         }
       }
