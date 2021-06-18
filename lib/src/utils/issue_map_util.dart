@@ -1,14 +1,16 @@
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart';
+import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 
 AnalysisError codeIssueToAnalysisError(Issue issue, ResolvedUnitResult analysisResult) {
+  logUtil.info('parse issue  = $issue');
   return AnalysisError(
     issue.errorSeverity!,
     issue.errorType!,
     Location(
-      analysisResult.unit!.declaredElement!.source.fullName,
+      analysisResult.unit?.declaredElement?.source.fullName ?? 'unknown',
       issue.offset!,
       issue.length!,
       issue.line!,
@@ -16,8 +18,8 @@ AnalysisError codeIssueToAnalysisError(Issue issue, ResolvedUnitResult analysisR
       issue.endLine!,
       issue.endColumn!,
     ),
-    issue.message!,
-    issue.code!,
+    issue.message ?? '',
+    issue.code ?? '',
     correction: issue.correction,
     hasFix: issue.hasFix,
   );

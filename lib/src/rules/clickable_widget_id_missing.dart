@@ -8,9 +8,8 @@ import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
+import 'package:custom_code_analysis/src/plugin/starter.dart';
 import 'package:uuid/uuid.dart';
-
-List<String> existIdList = [];
 
 class ClickableWidgetIdMissing extends Rule {
   ClickableWidgetIdMissing(String ruleId) : super(ruleId: ruleId);
@@ -49,15 +48,15 @@ class ClickableWidgetIdMissing extends Rule {
     String? content = analysisResult.content;
 
     ClassElement? targetClazz;
-    for(final lib in analysisResult.libraryElement.importedLibraries){
-      for(final unit in lib.units){
+    for (final lib in analysisResult.libraryElement.importedLibraries) {
+      for (final unit in lib.units) {
         targetClazz = unit.getType(node.constructorName.type.name.name);
-        if(targetClazz != null){
+        if (targetClazz != null) {
           break;
         }
       }
     }
-    List<String> definedNameList = targetClazz?.fields?.map((e) => e.name)?.toList()??[];
+    List<String> definedNameList = targetClazz?.fields?.map((e) => e.name)?.toList() ?? [];
     List<String> _nameList = argumentList.map((e) => e.beginToken.lexeme).toList();
     for (final name in definedNameList) {
       if (name.toLowerCase().endsWith('uuid') && !_nameList.contains(name)) {
@@ -143,7 +142,9 @@ class ClickableWidgetIdMissing extends Rule {
               length: node.length,
               line: analysisResult.unit!.lineInfo!.getLocation(node.offset).lineNumber,
               column: analysisResult.unit!.lineInfo!.getLocation(node.offset).columnNumber,
-              message: message,
+              endLine: analysisResult.unit!.lineInfo!.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit!.lineInfo!.getLocation(node.end).columnNumber,
+              message: generateMessage(node),
               code: code,
               comment: comment,
               correction: correction,
@@ -152,6 +153,44 @@ class ClickableWidgetIdMissing extends Rule {
               filePath: analysisResult.unit!.declaredElement!.source.fullName,
             ))
         .toList();
+  }
+
+  String generateMessage(InstanceCreationExpression node) {
+    String message = '';
+    var argumentList = node.argumentList.arguments;
+
+    if (argumentList.isEmpty) {
+      /// 参数列表为空，肯定没有uuid，需要修复
+      message = '没有uuid';
+    } else if (argumentList.map((e) => e.beginToken.lexeme).toList().every((element) => !element.endsWith('uuid'))) {
+      /// 没有找到任何以uuid结尾的字段名
+      message = '参数列表为空，缺少uuid';
+    } else {
+      /// 遍历每一个属性
+      for (final item in argumentList) {
+        /// 属性名以 uuid 或 Uuid 结尾
+        bool _hasFindTargetField = item.beginToken.lexeme.endsWith('uuid') || item.beginToken.lexeme.endsWith('Uuid');
+
+        /// 属性值等于 null|'null'|''|' '
+        bool _isInValidValue = item.endToken.lexeme == null ||
+            item.endToken.lexeme == 'null' ||
+            item.endToken.lexeme.replaceAll('\'', '') == '' ||
+            item.endToken.lexeme.replaceAll('\'', '') == ' ' ||
+            item.endToken.lexeme.isEmpty;
+
+        if (_hasFindTargetField && _isInValidValue) {
+          /// 字段名符合条件、字段值不符合条件
+          message = 'uuid值不符合条件';
+        } else if (_hasFindTargetField && !_isInValidValue) {
+          /// 字段名、字段值都符合条件
+          if (existIdList.contains(item.endToken.lexeme)) {
+            /// uuid重复了
+            message = 'uuid重复了';
+          }
+        }
+      }
+    }
+    return message;
   }
 }
 
