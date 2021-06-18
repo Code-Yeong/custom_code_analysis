@@ -10,7 +10,7 @@ const _rulesKey = 'rules';
 class AnalysisOptions {
   static AnalysisOptions fromYamlMap(YamlMap yamlMap) {
     YamlMap? map = yamlMap[_rootKey];
-    logUtil.info('parse map = $map, origin = $yamlMap');
+    // logUtil.info('parse map = $map, origin = $yamlMap');
     if(map == null){
       return AnalysisOptions(
         rules: [],

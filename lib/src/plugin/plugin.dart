@@ -39,24 +39,26 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
   @override
   String get version => '1.0.0';
 
-  @override
-  Future<plugin.PluginVersionCheckResult> handlePluginVersionCheck(plugin.PluginVersionCheckParams parameters) {
-    logUtil.info('parameters = $parameters');
-    channel.sendNotification(plugin.PluginErrorParams(false, 'customErroor', parameters.toString()).toNotification());
-    return super.handlePluginVersionCheck(parameters);
-  }
+  // @override
+  // Future<plugin.PluginVersionCheckResult> handlePluginVersionCheck(plugin.PluginVersionCheckParams parameters) {
+  //   logUtil.info('parameters = $parameters');
+  //   channel.sendNotification(plugin.PluginErrorParams(false, 'customErroor', parameters.toString()).toNotification());
+  //   return super.handlePluginVersionCheck(parameters);
+  // }
 
   @override
   void contentChanged(String path) {
     AnalysisDriverGeneric driver = super.driverForPath(path)!;
+    logUtil.info('File content changed: $path');
     driver.addFile(path);
   }
 
   @override
   AnalysisDriverGeneric createAnalysisDriver(plugin.ContextRoot contextRoot) {
+    logUtil.info('context root: ${contextRoot.root}');
     final analysisOptionsFile = io.File(p.absolute(contextRoot.root, analysisOptionsFileName));
     _yamlMap = (loadYaml(analysisOptionsFile.readAsStringSync()) as YamlMap?)!;
-    logUtil.info('_yamlMap = $_yamlMap');
+    // logUtil.info('_yamlMap = $_yamlMap');
     final analysisRoot = analyzer.ContextRoot(contextRoot.root, contextRoot.exclude, pathContext: resourceProvider.pathContext)
       ..optionsFilePath = contextRoot.optionsFile;
 
@@ -126,7 +128,7 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
 
   void _processResult(AnalysisDriver driver, ResolvedUnitResult analysisResult) {
     try {
-      if (analysisResult.unit != null && analysisResult.libraryElement != null) {
+      if (analysisResult.unit != null) {
         String _fullName = analysisResult.unit!.declaredElement!.source.fullName;
 
         var globList = AnalysisOptions.fromYamlMap(_yamlMap).excludes!.map((e) => Glob(p.join(_sourceUri!, e))).toList();
@@ -136,15 +138,15 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
 
         List<Issue> issueList = [];
         for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules!) {
-          logUtil.info('ruleId = $ruleId');
+          // logUtil.info('ruleId = $ruleId');
           var rule = findRuleById(ruleId);
           if (rule != null) {
             issueList.addAll(rule.check(analysisResult));
-            print('issueList =$issueList');
+            // print('issueList =$issueList');
           }
         }
         if (issueList.isNotEmpty) {
-          logUtil.info('send Notification: ${issueList.length}');
+          // logUtil.info('send Notification: ${issueList.length}');
           channel.sendNotification(
             plugin.AnalysisErrorsParams(
               analysisResult.path!,

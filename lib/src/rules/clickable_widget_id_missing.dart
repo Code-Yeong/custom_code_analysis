@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
+import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:uuid/uuid.dart';
@@ -131,6 +132,7 @@ class ClickableWidgetIdMissing extends Rule {
 
   @override
   List<Issue> check(ResolvedUnitResult analysisResult) {
+    logUtil.info('check file: ${analysisResult.libraryElement.source.fullName}');
     final visitor = _ParameterVisitor(analysisResult: analysisResult, rule: this);
     analysisResult.unit!.accept(visitor);
     return visitor.nodes

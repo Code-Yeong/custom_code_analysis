@@ -17,7 +17,7 @@ class CodeIssueVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     node.visitChildren(this);
-    logUtil.info('name = ${node.methodName.name}, method = ${rule!.methodName}');
+    // logUtil.info('name = ${node.methodName.name}, method = ${rule!.methodName}');
     if (node.methodName.name == rule!.methodName) {
       int lineNumber = analysisResult!.unit!.lineInfo!.getLocation(node.offset).lineNumber;
       var ignoreInfo = IgnoreInfo.forDart(analysisResult!.unit!, analysisResult!.content!);
