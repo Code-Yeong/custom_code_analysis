@@ -13,12 +13,10 @@ import 'package:yaml/yaml.dart';
 List<String?> excludedFilesFromAnalysisOptions(File analysisOptions) {
   final parsedOptions = loadYaml(analysisOptions.readAsStringSync()) as YamlMap;
   final analyzerSection = parsedOptions.nodes['analyzer'];
-  if (analysisOptions != null) {
-    final dynamic excludedSection = (analyzerSection as YamlMap)['exclude'];
-    if (excludedSection != null) {
-      // ignore: avoid_annotating_with_dynamic
-      return (excludedSection as YamlList).map((dynamic path) => path as String?).toList();
-    }
+  final dynamic excludedSection = (analyzerSection as YamlMap)['exclude'];
+  if (excludedSection != null) {
+    // ignore: avoid_annotating_with_dynamic
+    return (excludedSection as YamlList).map((dynamic path) => path as String?).toList();
   }
   return [];
 }
@@ -38,7 +36,7 @@ Future<List<AnalysisError>> collectAnalyzerErrors(AnalysisContextCollection anal
     final normalizedPath = normalize(filePath);
     // var stopWatch = Stopwatch();
     // stopWatch.start();
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath) as ResolvedUnitResult;
     // ParsedUnitResult parsedUnit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getParsedUnit(normalizedPath);
     // stopWatch.stop();
     // print('timeCost = ${stopWatch.elapsedMilliseconds}'); //timeCost = 2345 , 80
@@ -69,13 +67,13 @@ AnalysisError codeIssueToAnalysisError(Issue issue, ResolvedUnitResult analysisR
     issue.errorSeverity!,
     issue.errorType!,
     Location(
-      analysisResult.unit!.declaredElement!.source.fullName,
+      analysisResult.unit.declaredElement!.source.fullName,
       issue.offset!,
       issue.length!,
       issue.line!,
       issue.column!,
-      issue.endLine!,
-      issue.endColumn!,
+      endLine: issue.endLine!,
+      endColumn:issue.endColumn!,
     ),
     issue.message!,
     issue.code!,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/analysis/results.dart' as re;
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:custom_code_analysis/src/configs/rule_config.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
@@ -16,12 +17,22 @@ void main() {
       excludedPaths: [],
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
+
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
-    Rule _codeRule = findRuleById('clickable-widget-uuid-missing')!;
-    var resultList = _codeRule.check(unit);
-    // print(resultList);
-    expect(resultList.length, 8);
+
+    for(final context in analysisContextCollection.contexts){
+      context.currentSession.getErrors(normalizedPath);
+      print(context.contextRoot.analyzedFiles().toList());
+    }
+
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getParsedUnit(normalizedPath);
+    if(unit is ResolvedUnitResult) {
+      // final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+      Rule _codeRule = findRuleById('clickable-widget-uuid-missing')!;
+      var resultList = _codeRule.check(unit as ResolvedUnitResult);
+      // print(resultList);
+      expect(resultList.length, 8);
+    }
   });
 
   test('Check:avoid-using-color', () async {
@@ -32,9 +43,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-color')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 2);
   });
@@ -47,9 +58,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-colors')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 3);
   });
@@ -62,9 +73,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-show-bottom-modal-sheet')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 1);
   });
@@ -77,9 +88,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-show-bottom-sheet')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 1);
   });
@@ -92,9 +103,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-show-date-picker')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 1);
   });
@@ -107,9 +118,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-show-date-range-picker')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 1);
   });
@@ -122,9 +133,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-show-dialog')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 1);
   });
@@ -137,9 +148,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-show-general-dialog')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 1);
   });
@@ -152,9 +163,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-show-menu')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 1);
   });
@@ -167,9 +178,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-show-search')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 1);
   });
@@ -182,9 +193,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('avoid-using-show-time-picker')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 1);
   });
@@ -197,9 +208,9 @@ void main() {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
     final normalizedPath = normalize(filePath);
-    ResolvedUnitResult unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
+    final unit = await analysisContextCollection.contextFor(normalizedPath).currentSession.getResolvedUnit(normalizedPath);
     Rule _codeRule = findRuleById('override-hash-code-method')!;
-    var resultList = _codeRule.check(unit);
+    var resultList = _codeRule.check(unit as ResolvedUnitResult);
     // print(resultList);
     expect(resultList.length, 2);
   });

@@ -57,13 +57,13 @@ class CustomAnalyzer {
       final analysisContext = collection.contextFor(normalized);
       final result =
           // ignore: deprecated_member_use
-          await analysisContext.currentSession.getResolvedUnit(normalized);
+          await analysisContext.currentSession.getResolvedUnit(normalized) as ResolvedUnitResult;
 
-      final unit = result.unit;
-      final content = result.content;
-      if (unit == null || content == null || result.state != ResultState.VALID) {
-        continue;
-      }
+      // final unit = result.unit;
+      // final content = result.content;
+      // if (content == null || result.state != ResultState.VALID) {
+      //   continue;
+      // }
 
       /// 记录结果
       var resultList = _checkOnCodeIssues(filePath, rootFolder, result);

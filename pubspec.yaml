@@ -1,14 +1,14 @@
 name: custom_code_analysis
 description: custom code analysis rules
-version: 1.2.3
+version: 1.2.4
 homepage:
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
-  analyzer: ">=1.4.0 <1.6.0"
-  analyzer_plugin: ^0.6.0
+  analyzer: ^3.3.0
+  analyzer_plugin: ^0.9.0
   quick_log: ^4.0.1
   path: ^1.8.0
   uuid: ^3.0.1

@@ -116,3 +116,6 @@
 
 ## 1.2.3
 - Fix bug
+
+## 1.2.4
+- Upgrade analyzer_plugin

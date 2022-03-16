@@ -3,12 +3,14 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/src/ignore_comments/ignore_info.dart';
+
+// import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
 import 'package:custom_code_analysis/src/plugin/starter.dart';
+import 'package:custom_code_analysis/src/utils/suppression.dart';
 import 'package:uuid/uuid.dart';
 
 class ClickableWidgetIdMissing extends Rule {
@@ -34,7 +36,7 @@ class ClickableWidgetIdMissing extends Rule {
   static const requiredField = 'uuid';
 
   int _getLineNumber(Token token, ResolvedUnitResult analysisResult) {
-    return analysisResult.unit!.lineInfo!.getLocation(token.offset).lineNumber;
+    return analysisResult.unit.lineInfo!.getLocation(token.offset).lineNumber;
   }
 
   String _generateReplacement(InstanceCreationExpression node, ResolvedUnitResult analysisResult) {
@@ -56,7 +58,7 @@ class ClickableWidgetIdMissing extends Rule {
         }
       }
     }
-    List<String> definedNameList = targetClazz?.fields?.map((e) => e.name)?.toList() ?? [];
+    List<String> definedNameList = targetClazz?.fields.map((e) => e.name).toList() ?? [];
     List<String> _nameList = argumentList.map((e) => e.beginToken.lexeme).toList();
     for (final name in definedNameList) {
       if (name.toLowerCase().endsWith('uuid') && !_nameList.contains(name)) {
@@ -66,10 +68,10 @@ class ClickableWidgetIdMissing extends Rule {
         String _randomId = Uuid().v4().toString().replaceAll('-', '');
         if (left == right) {
           result =
-              '${node.constructorName}${content!.substring(node.argumentList.leftParenthesis.offset, node.argumentList.leftParenthesis.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
+              '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.leftParenthesis.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
         } else {
           result =
-              '${node.constructorName}${content!.substring(node.argumentList.leftParenthesis.offset, node.argumentList.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
+              '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
         }
       }
     }
@@ -101,8 +103,7 @@ class ClickableWidgetIdMissing extends Rule {
 
     for (final item in argumentList) {
       if ((item.beginToken.lexeme.endsWith('uuid') || item.beginToken.lexeme.endsWith('Uuid')) &&
-          (item.endToken.lexeme == null ||
-              item.endToken.lexeme == 'null' ||
+          (item.endToken.lexeme == 'null' ||
               item.endToken.lexeme.replaceAll('\'', '') == '' ||
               item.endToken.lexeme.replaceAll('\'', '') == ' ' ||
               item.endToken.lexeme.isEmpty)) {
@@ -110,7 +111,7 @@ class ClickableWidgetIdMissing extends Rule {
       }
     }
 
-    String _originSource = content!.substring(node.argumentList.offset, node.argumentList.end);
+    String _originSource = content.substring(node.argumentList.offset, node.argumentList.end);
 
     for (final obj in expressionList) {
       String _p1 = '${obj.beginToken.lexeme}: ${obj.endToken.lexeme}';
@@ -133,24 +134,24 @@ class ClickableWidgetIdMissing extends Rule {
   List<Issue> check(ResolvedUnitResult analysisResult) {
     logUtil.info('check file: ${analysisResult.libraryElement.source.fullName}');
     final visitor = _ParameterVisitor(analysisResult: analysisResult, rule: this);
-    analysisResult.unit!.accept(visitor);
+    analysisResult.unit.accept(visitor);
     return visitor.nodes
         .map((node) => Issue(
               errorSeverity: AnalysisErrorSeverity.INFO,
               errorType: AnalysisErrorType.HINT,
               offset: node.offset,
               length: node.length,
-              line: analysisResult.unit!.lineInfo!.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit!.lineInfo!.getLocation(node.offset).columnNumber,
-              endLine: analysisResult.unit!.lineInfo!.getLocation(node.end).lineNumber,
-              endColumn: analysisResult.unit!.lineInfo!.getLocation(node.end).columnNumber,
+              line: analysisResult.unit.lineInfo!.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit.lineInfo!.getLocation(node.offset).columnNumber,
+              endLine: analysisResult.unit.lineInfo!.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit.lineInfo!.getLocation(node.end).columnNumber,
               message: generateMessage(node),
               code: code,
               comment: comment,
               correction: correction,
               replacement: _generateReplacement(node, analysisResult),
               hasFix: false,
-              filePath: analysisResult.unit!.declaredElement!.source.fullName,
+              filePath: analysisResult.unit.declaredElement!.source.fullName,
             ))
         .toList();
   }
@@ -172,8 +173,7 @@ class ClickableWidgetIdMissing extends Rule {
         bool _hasFindTargetField = item.beginToken.lexeme.toLowerCase().endsWith('uuid');
 
         /// 属性值等于 null|'null'|''|' '
-        bool _isInValidValue = item.endToken.lexeme == null ||
-            item.endToken.lexeme == 'null' ||
+        bool _isInValidValue = item.endToken.lexeme == 'null' ||
             item.endToken.lexeme.replaceAll('\'', '') == '' ||
             item.endToken.lexeme.replaceAll('\'', '') == ' ' ||
             item.endToken.lexeme.isEmpty;
@@ -209,9 +209,6 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
     var _metaData = node.staticType!.element!.metadata;
     bool _isTargetAnnotation = false;
 
-    int lineNumber = analysisResult!.unit!.lineInfo!.getLocation(node.offset).lineNumber;
-    var ignoreInfo = IgnoreInfo.forDart(analysisResult!.unit!, analysisResult!.content!);
-
     /// 判断是否被 @Clickable 标记
     for (final item in _metaData) {
       if (item.computeConstantValue()?.type?.getDisplayString(withNullability: false) == ClickableWidgetIdMissing.annotation) {
@@ -225,8 +222,11 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
       _isTargetAnnotation = true;
     }
 
+    int lineNumber = analysisResult!.unit.lineInfo!.getLocation(node.offset).lineNumber;
+    final ignores = Suppression(analysisResult!.content, analysisResult!.lineInfo);
+
     /// 判断是否忽略
-    if (ignoreInfo.ignoredAt(rule!.code!.replaceAll('-', '_'), lineNumber)) {
+    if (!ignores.isSuppressedAt(rule!.code!.replaceAll('-', '_'), lineNumber)) {
       _isTargetAnnotation = false;
     }
 
@@ -250,8 +250,7 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
           bool _hasFindTargetField = item.beginToken.lexeme.toLowerCase().endsWith('uuid');
 
           /// 属性值等于 null|'null'|''|' '
-          bool _isInValidValue = item.endToken.lexeme == null ||
-              item.endToken.lexeme == 'null' ||
+          bool _isInValidValue = item.endToken.lexeme == 'null' ||
               item.endToken.lexeme.replaceAll('\'', '') == '' ||
               item.endToken.lexeme.replaceAll('\'', '') == ' ' ||
               item.endToken.lexeme.isEmpty;
@@ -266,12 +265,12 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
               _isNeedFix = true;
             } else {
               /// uuid不重复，加入列表中记录下来
-              if(!item.endToken.lexeme.toLowerCase().contains('uuid')) {
+              if (!item.endToken.lexeme.toLowerCase().contains('uuid')) {
                 existIdList.add(item.endToken.lexeme);
               }
             }
           }
-          if(_isNeedFix){
+          if (_isNeedFix) {
             break;
           }
         }

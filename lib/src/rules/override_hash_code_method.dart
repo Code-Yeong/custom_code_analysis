@@ -5,6 +5,7 @@ import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
+import 'package:custom_code_analysis/src/utils/suppression.dart';
 
 class OverrideHashcodeMethod extends Rule {
   OverrideHashcodeMethod(String ruleId) : super(ruleId: ruleId);
@@ -27,7 +28,7 @@ class OverrideHashcodeMethod extends Rule {
   @override
   Iterable<Issue> check(ResolvedUnitResult analysisResult) {
     final visitor = _MirrorVisitor(analysisResult, this);
-    analysisResult.unit!.accept(visitor);
+    analysisResult.unit.accept(visitor);
 
     return visitor.nodes
         .map((node) => Issue(
@@ -35,17 +36,17 @@ class OverrideHashcodeMethod extends Rule {
               errorType: AnalysisErrorType.HINT,
               offset: node.offset,
               length: node.length,
-              line: analysisResult.unit!.lineInfo!.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit!.lineInfo!.getLocation(node.offset).columnNumber,
-              endLine: analysisResult.unit!.lineInfo!.getLocation(node.end).lineNumber,
-              endColumn: analysisResult.unit!.lineInfo!.getLocation(node.end).columnNumber,
+              line: analysisResult.unit.lineInfo!.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit.lineInfo!.getLocation(node.offset).columnNumber,
+              endLine: analysisResult.unit.lineInfo!.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit.lineInfo!.getLocation(node.end).columnNumber,
               // message: message,
               message: generateMessage(node as ClassDeclaration, analysisResult),
               code: code,
               correction: generateMessage(node, analysisResult),
               replacement: generateReplacement(node, analysisResult),
               hasFix: false,
-              filePath: analysisResult.unit!.declaredElement!.source.fullName,
+              filePath: analysisResult.unit.declaredElement!.source.fullName,
             ))
         .toList();
   }
@@ -139,10 +140,10 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitClassDeclaration(ClassDeclaration node) {
     String superClassName = node.declaredElement!.supertype!.getDisplayString(withNullability: false);
-    if (superClassName != null && superClassName == 'ReduxViewModel') {
-      int lineNumber = analysisResult.unit!.lineInfo!.getLocation(node.offset).lineNumber;
-      var ignoreInfo = IgnoreInfo.forDart(analysisResult.unit!, analysisResult.content!);
-      if (ignoreInfo.ignoredAt(rule.ruleId!.replaceAll('-', '_'), lineNumber)) {
+    if (superClassName == 'ReduxViewModel') {
+      int lineNumber = analysisResult.unit.lineInfo!.getLocation(node.offset).lineNumber;
+      final ignores = Suppression(analysisResult.content, analysisResult.lineInfo);
+      if (ignores.isSuppressedAt(rule.code!.replaceAll('-', '_'), lineNumber)) {
         return;
       }
       bool _isNeedFix = true;
