@@ -74,9 +74,9 @@ packages:
   custom_code_analysis:
     dependency: "direct main"
     description:
-      name: custom_code_analysis
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "/Users/chivan/Documents/private_project/custom_code_analysis"
+      relative: false
+    source: path
     version: "1.2.3"
   dart_style:
     dependency: transitive

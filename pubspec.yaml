@@ -1,7 +1,7 @@
 name: custom_code_analysis
 description: custom code analysis rules
-version: 1.2.4
-homepage:
+version: 1.2.5
+homepage: https://github.com/Code-Yeong/custom_code_analysis
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
