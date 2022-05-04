@@ -1,4 +1,3 @@
-import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:yaml/yaml.dart';
 
 const String analysisOptionsFileName = 'analysis_options.yaml';
@@ -11,7 +10,7 @@ class AnalysisOptions {
   static AnalysisOptions fromYamlMap(YamlMap yamlMap) {
     YamlMap? map = yamlMap[_rootKey];
     // logUtil.info('parse map = $map, origin = $yamlMap');
-    if(map == null){
+    if (map == null) {
       return AnalysisOptions(
         rules: [],
         excludes: [],

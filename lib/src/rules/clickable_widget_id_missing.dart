@@ -226,7 +226,7 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
     final ignores = Suppression(analysisResult!.content, analysisResult!.lineInfo);
 
     /// 判断是否忽略
-    if (!ignores.isSuppressedAt(rule!.code!.replaceAll('-', '_'), lineNumber)) {
+    if (ignores.isSuppressedAt(rule!.code!.replaceAll('-', '_'), lineNumber)) {
       _isTargetAnnotation = false;
     }
 

@@ -5,10 +5,12 @@ import 'package:analyzer/dart/analysis/context_locator.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
+import 'package:analyzer/src/dart/analysis/byte_store.dart';
 import 'package:analyzer/src/dart/analysis/context_builder.dart';
 
 // import 'package:analyzer/src/context/context_root.dart' as analyzer;
 import 'package:analyzer/src/dart/analysis/driver.dart';
+import 'package:analyzer/src/dart/analysis/file_byte_store.dart';
 import 'package:analyzer_plugin/plugin/plugin.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
 import 'package:analyzer_plugin/protocol/protocol_generated.dart';
@@ -21,25 +23,8 @@ import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
-
-
-
-
-// ignore_for_file: implementation_imports
-import 'package:analyzer/dart/analysis/analysis_context.dart';
-import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
-import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/dart/analysis/analysis_context_collection.dart';
-import 'package:analyzer/src/dart/analysis/byte_store.dart';
-import 'package:analyzer/src/dart/analysis/file_byte_store.dart';
-import 'package:glob/glob.dart';
-import 'package:path/path.dart';
-
 import '../model/analysis_options.dart';
 // class TestPlugin extends ServerPlugin with FixesMixin, DartFixesMixin {
-
-
-
 
 ByteStore createByteStore(PhysicalResourceProvider resourceProvider) {
   const miB = 1024 * 1024 /*1 MiB*/;
@@ -125,9 +110,6 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
   //   return dartDriver;
   // }
 
-
-
-
   final _byteStore = createByteStore(PhysicalResourceProvider.INSTANCE);
 
   @override
@@ -198,10 +180,6 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
     return dartDriver;
   }
 
-  void _onError(Object e, StackTrace stackTrace) {
-    channel.sendNotification(plugin.PluginErrorParams(false, e.toString(), stackTrace.toString()).toNotification());
-  }
-
   @override
   Future<plugin.AnalysisSetPriorityFilesResult> handleAnalysisSetPriorityFiles(plugin.AnalysisSetPriorityFilesParams parameters) async {
     _filesFromSetPriorityFilesRequest = parameters.files;
@@ -229,43 +207,36 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
     String? _uri;
     // ignore: deprecated_member_use
     String? _optionsFile = dartDriver.analysisContext!.contextRoot.optionsFile!.path;
-    if (_optionsFile != null) {
-      // ignore: deprecated_member_use
-      _uri = dartDriver.resourceProvider.pathContext.dirname(_optionsFile);
-    }
+    _uri = dartDriver.resourceProvider.pathContext.dirname(_optionsFile);
     return _uri;
   }
 
   void _processResult(AnalysisDriver driver, ResolvedUnitResult analysisResult) {
     try {
-      if (analysisResult.unit != null) {
-        String _fullName = analysisResult.unit.declaredElement!.source.fullName;
+      String _fullName = analysisResult.unit.declaredElement!.source.fullName;
 
-        var globList = AnalysisOptions.fromYamlMap(_yamlMap).excludes!.map((e) => Glob(p.join(_sourceUri!, e))).toList();
-        if (globList.any((glob) => glob.matches(_fullName))) {
-          return;
-        }
+      var globList = AnalysisOptions.fromYamlMap(_yamlMap).excludes!.map((e) => Glob(p.join(_sourceUri!, e))).toList();
+      if (globList.any((glob) => glob.matches(_fullName))) {
+        return;
+      }
 
-        List<Issue> issueList = [];
-        for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules!) {
-          // logUtil.info('ruleId = $ruleId');
-          var rule = findRuleById(ruleId);
-          if (rule != null) {
-            issueList.addAll(rule.check(analysisResult));
-            // print('issueList =$issueList');
-          }
+      List<Issue> issueList = [];
+      for (final ruleId in AnalysisOptions.fromYamlMap(_yamlMap).rules!) {
+        // logUtil.info('ruleId = $ruleId');
+        var rule = findRuleById(ruleId);
+        if (rule != null) {
+          issueList.addAll(rule.check(analysisResult));
+          // print('issueList =$issueList');
         }
-        if (issueList.isNotEmpty) {
-          // logUtil.info('send Notification: ${issueList.length}');
-          channel.sendNotification(
-            plugin.AnalysisErrorsParams(
-              analysisResult.path,
-              issueList.map((issue) => codeIssueToAnalysisError(issue, analysisResult)).toList(),
-            ).toNotification(),
-          );
-        } else {
-          channel.sendNotification(plugin.AnalysisErrorsParams(analysisResult.path, []).toNotification());
-        }
+      }
+      if (issueList.isNotEmpty) {
+        // logUtil.info('send Notification: ${issueList.length}');
+        channel.sendNotification(
+          plugin.AnalysisErrorsParams(
+            analysisResult.path,
+            issueList.map((issue) => codeIssueToAnalysisError(issue, analysisResult)).toList(),
+          ).toNotification(),
+        );
       } else {
         channel.sendNotification(plugin.AnalysisErrorsParams(analysisResult.path, []).toNotification());
       }
