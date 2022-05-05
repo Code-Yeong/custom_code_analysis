@@ -30,29 +30,31 @@ List<AnalysisErrorFixes> codeIssueToAnalysisErrorFixes(List<Issue> issueList, Re
       .map(
         (issue) => AnalysisErrorFixes(
           codeIssueToAnalysisError(issue, analysisResult),
-          fixes: [
-            if (issue.correction != null)
-              PrioritizedSourceChange(
-                99,
-                SourceChange(
-                  issue.comment!,
-                  edits: [
-                    SourceFileEdit(
-                      analysisResult.libraryElement.source.fullName,
-                      analysisResult.libraryElement.source.modificationStamp,
-                      edits: [
-                        SourceEdit(
-                          issue.offset!,
-                          issue.length!,
-                          issue.replacement ?? '',
-                        ),
-                      ],
+          fixes: issue.hasFix!
+              ? [
+                  if (issue.correction != null)
+                    PrioritizedSourceChange(
+                      99,
+                      SourceChange(
+                        issue.comment!,
+                        edits: [
+                          SourceFileEdit(
+                            analysisResult.libraryElement.source.fullName,
+                            1,
+                            edits: [
+                              SourceEdit(
+                                issue.offset!,
+                                issue.length!,
+                                issue.replacement ?? '',
+                              ),
+                            ],
+                          ),
+                        ],
+                        // selection: Position(unitResult.libraryElement.source.fullName, issue.offset),
+                      ),
                     ),
-                  ],
-                  // selection: Position(unitResult.libraryElement.source.fullName, issue.offset),
-                ),
-              ),
-          ],
+                ]
+              : null,
         ),
       )
       .toList();

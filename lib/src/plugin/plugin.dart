@@ -14,6 +14,7 @@ import 'package:analyzer/src/dart/analysis/file_byte_store.dart';
 import 'package:analyzer_plugin/plugin/plugin.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
 import 'package:analyzer_plugin/protocol/protocol_generated.dart';
+import 'package:custom_code_analysis/custom_code_analysis.dart';
 import 'package:custom_code_analysis/src/configs/rule_config.dart';
 import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/model/analysis_options.dart';
@@ -259,7 +260,8 @@ class CustomCodeAnalysisPlugin extends ServerPlugin {
         }
       }
 
-      return plugin.EditGetFixesResult(errorFixes);
+      // 找到弹框对应位置的修复列表
+      return plugin.EditGetFixesResult(errorFixes.where((element) => element.error.location.offset == parameters.offset).toList());
     } on Exception catch (e, stackTrace) {
       channel.sendNotification(plugin.PluginErrorParams(false, e.toString(), stackTrace.toString()).toNotification());
 

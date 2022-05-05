@@ -1,12 +1,12 @@
 name: custom_code_analysis_bootstrap
-version: 1.2.5
+version: 1.2.6
 
 environment:
   sdk: '>=2.7.0 <3.0.0'
 
 dependencies:
 #   线上插件用这个依赖
-  custom_code_analysis: 1.2.5
+  custom_code_analysis: 1.2.6
 
 #   调试本地插件用这个依赖（仅限本地测试时打开，发布时关闭）
 #  custom_code_analysis:

@@ -3,13 +3,12 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
-
 // import 'package:analyzer/src/ignore_comments/ignore_info.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:custom_code_analysis/src/logger/log.dart';
 import 'package:custom_code_analysis/src/model/error_issue.dart';
 import 'package:custom_code_analysis/src/model/rule.dart';
-import 'package:custom_code_analysis/src/plugin/starter.dart';
+import 'package:custom_code_analysis/src/utils/checker_utils.dart';
 import 'package:custom_code_analysis/src/utils/suppression.dart';
 import 'package:uuid/uuid.dart';
 
@@ -61,17 +60,17 @@ class ClickableWidgetIdMissing extends Rule {
     List<String> definedNameList = targetClazz?.fields.map((e) => e.name).toList() ?? [];
     List<String> _nameList = argumentList.map((e) => e.beginToken.lexeme).toList();
     for (final name in definedNameList) {
-      if (name.toLowerCase().endsWith('uuid') && !_nameList.contains(name)) {
+      if (name.trim().toLowerCase().endsWith('uuid') && !_nameList.contains(name.trim())) {
         int left = _getLineNumber(node.argumentList.leftParenthesis, analysisResult);
         int right = _getLineNumber(node.argumentList.rightParenthesis, analysisResult);
         // logUtil.info('node = ,left = $left, ${node.argumentList.leftParenthesis.offset}, ${node}');
         String _randomId = Uuid().v4().toString().replaceAll('-', '');
         if (left == right) {
           result =
-              '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.leftParenthesis.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
+              '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.leftParenthesis.offset + 1)}$name: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
         } else {
           result =
-              '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.offset + 1)}$requiredField: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
+              '${node.constructorName}${content.substring(node.argumentList.leftParenthesis.offset, node.argumentList.offset + 1)}$name: \'$_randomId\', ${content.substring(node.argumentList.leftParenthesis.offset + 1, node.end)}';
         }
       }
     }
@@ -132,31 +131,34 @@ class ClickableWidgetIdMissing extends Rule {
 
   @override
   List<Issue> check(ResolvedUnitResult analysisResult) {
-    logUtil.info('check file: ${analysisResult.libraryElement.source.fullName}');
+    String fileName = analysisResult.libraryElement.source.fullName;
+    logUtil.info('check file: $fileName');
+    clearFileIdRecords(fileName);
     final visitor = _ParameterVisitor(analysisResult: analysisResult, rule: this);
     analysisResult.unit.accept(visitor);
-    return visitor.nodes
-        .map((node) => Issue(
-              errorSeverity: AnalysisErrorSeverity.INFO,
-              errorType: AnalysisErrorType.HINT,
-              offset: node.offset,
-              length: node.length,
-              line: analysisResult.unit.lineInfo!.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit.lineInfo!.getLocation(node.offset).columnNumber,
-              endLine: analysisResult.unit.lineInfo!.getLocation(node.end).lineNumber,
-              endColumn: analysisResult.unit.lineInfo!.getLocation(node.end).columnNumber,
-              message: generateMessage(node),
-              code: code,
-              comment: comment,
-              correction: correction,
-              replacement: _generateReplacement(node, analysisResult),
-              hasFix: false,
-              filePath: analysisResult.unit.declaredElement!.source.fullName,
-            ))
-        .toList();
+    return visitor.nodes.map((node) {
+      String message = generateMessage(node, analysisResult.libraryElement.source.fullName);
+      return Issue(
+        errorSeverity: AnalysisErrorSeverity.INFO,
+        errorType: AnalysisErrorType.HINT,
+        offset: node.offset,
+        length: node.length,
+        line: analysisResult.unit.lineInfo!.getLocation(node.offset).lineNumber,
+        column: analysisResult.unit.lineInfo!.getLocation(node.offset).columnNumber,
+        endLine: analysisResult.unit.lineInfo!.getLocation(node.end).lineNumber,
+        endColumn: analysisResult.unit.lineInfo!.getLocation(node.end).columnNumber,
+        message: message,
+        code: code,
+        comment: comment,
+        correction: correction,
+        replacement: _generateReplacement(node, analysisResult),
+        hasFix: message != "uuid重复了",
+        filePath: analysisResult.unit.declaredElement!.source.fullName,
+      );
+    }).toList();
   }
 
-  String generateMessage(InstanceCreationExpression node) {
+  String generateMessage(InstanceCreationExpression node, String fileName) {
     String message = '';
     var argumentList = node.argumentList.arguments;
 
@@ -183,9 +185,12 @@ class ClickableWidgetIdMissing extends Rule {
           message = 'uuid值不符合条件';
         } else if (_hasFindTargetField && !_isInValidValue) {
           /// 字段名、字段值都符合条件
-          if (existIdList.contains(item.endToken.lexeme)) {
+          if (isIdExist(item.endToken.lexeme)) {
             /// uuid重复了
             message = 'uuid重复了';
+          } else {
+            /// uuid不重复，加入列表中记录下来
+            addFileIdRecord(fileName, item.endToken.lexeme);
           }
         }
       }
@@ -260,13 +265,14 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
             _isNeedFix = true;
           } else if (_hasFindTargetField && !_isInValidValue) {
             /// 字段名、字段值都符合条件
-            if (existIdList.contains(item.endToken.lexeme)) {
+            if (isIdExist(item.endToken.lexeme)) {
               /// uuid重复了
               _isNeedFix = true;
             } else {
               /// uuid不重复，加入列表中记录下来
               if (!item.endToken.lexeme.toLowerCase().contains('uuid')) {
-                existIdList.add(item.endToken.lexeme);
+                String fileName = analysisResult!.libraryElement.source.fullName;
+                addFileIdRecord(fileName, item.endToken.lexeme);
               }
             }
           }
