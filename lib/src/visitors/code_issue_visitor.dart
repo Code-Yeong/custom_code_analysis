@@ -21,7 +21,7 @@ class CodeIssueVisitor extends RecursiveAstVisitor<void> {
     node.visitChildren(this);
     // logUtil.info('name = ${node.methodName.name}, method = ${rule!.methodName}');
     if (node.methodName.name == rule!.methodName) {
-      int lineNumber = analysisResult!.unit.lineInfo!.getLocation(node.offset).lineNumber;
+      int lineNumber = analysisResult!.unit.lineInfo.getLocation(node.offset).lineNumber;
       final ignores = Suppression(analysisResult!.content, analysisResult!.lineInfo);
       if (!ignores.isSuppressedAt(rule!.code!.replaceAll('-', '_'), lineNumber)) {
         _nodes.add(node);

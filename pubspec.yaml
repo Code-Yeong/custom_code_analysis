@@ -7,8 +7,8 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
-  analyzer: ^3.3.0
-  analyzer_plugin: ^0.9.0
+  analyzer: ^4.0.0
+  analyzer_plugin: ^0.10.0
   quick_log: ^4.0.1
   path: ^1.8.0
   uuid: ^3.0.1

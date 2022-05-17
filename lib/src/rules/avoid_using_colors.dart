@@ -36,10 +36,10 @@ class AvoidUsingColors extends Rule {
               errorType: AnalysisErrorType.HINT,
               offset: node.offset,
               length: node.length,
-              line: analysisResult.unit.lineInfo!.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit.lineInfo!.getLocation(node.offset).columnNumber,
-              endLine: analysisResult.unit.lineInfo!.getLocation(node.end).lineNumber,
-              endColumn: analysisResult.unit.lineInfo!.getLocation(node.end).columnNumber,
+              line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
+              endLine: analysisResult.unit.lineInfo.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit.lineInfo.getLocation(node.end).columnNumber,
               message: message,
               code: code,
               correction: correction,
@@ -62,7 +62,7 @@ class ColorsCodeIssueVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.name == rule!.methodName) {
-      int lineNumber = analysisResult!.unit.lineInfo!.getLocation(node.offset).lineNumber;
+      int lineNumber = analysisResult!.unit.lineInfo.getLocation(node.offset).lineNumber;
       final ignores = Suppression(analysisResult!.content, analysisResult!.lineInfo);
       if (!ignores.isSuppressedAt(rule!.code!.replaceAll('-', '_'), lineNumber)) {
         _nodes.add(node);

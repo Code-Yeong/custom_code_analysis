@@ -1,3 +1,4 @@
+import 'package:custom_code_analysis/src/rules/avoid_import_private_action.dart';
 import 'package:custom_code_analysis/src/rules/avoid_using_color.dart';
 import 'package:custom_code_analysis/src/rules/avoid_using_colors.dart';
 import 'package:custom_code_analysis/src/rules/avoid_using_show_bottom_modal_sheet.dart';
@@ -28,6 +29,7 @@ Map<String, Rule> registeredRulesMap = {
   'avoid-using-show-time-picker': AvoidUsingShowTimePicker('avoid-using-show-time-picker'),
   'clickable-widget-uuid-missing': ClickableWidgetIdMissing('clickable-widget-uuid-missing'),
   'override-hash-code-method': OverrideHashcodeMethod('override-hash-code-method'),
+  'avoid-import-private-action': AvoidImportPrivateAction('avoid-import-private-action'),
 };
 
 Rule? findRuleById(String ruleId) {

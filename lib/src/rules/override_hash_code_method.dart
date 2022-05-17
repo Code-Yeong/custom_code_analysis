@@ -35,10 +35,10 @@ class OverrideHashcodeMethod extends Rule {
               errorType: AnalysisErrorType.HINT,
               offset: node.offset,
               length: node.length,
-              line: analysisResult.unit.lineInfo!.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit.lineInfo!.getLocation(node.offset).columnNumber,
-              endLine: analysisResult.unit.lineInfo!.getLocation(node.end).lineNumber,
-              endColumn: analysisResult.unit.lineInfo!.getLocation(node.end).columnNumber,
+              line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
+              endLine: analysisResult.unit.lineInfo.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit.lineInfo.getLocation(node.end).columnNumber,
               // message: message,
               message: generateMessage(node as ClassDeclaration, analysisResult),
               code: code,
@@ -140,7 +140,7 @@ class _MirrorVisitor extends RecursiveAstVisitor<void> {
   void visitClassDeclaration(ClassDeclaration node) {
     String superClassName = node.declaredElement!.supertype!.getDisplayString(withNullability: false);
     if (superClassName == 'ReduxViewModel') {
-      int lineNumber = analysisResult.unit.lineInfo!.getLocation(node.offset).lineNumber;
+      int lineNumber = analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber;
       final ignores = Suppression(analysisResult.content, analysisResult.lineInfo);
       if (ignores.isSuppressedAt(rule.code!.replaceAll('-', '_'), lineNumber)) {
         return;

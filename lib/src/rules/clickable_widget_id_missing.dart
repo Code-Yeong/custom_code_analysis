@@ -36,7 +36,7 @@ class ClickableWidgetIdMissing extends Rule {
   static const requiredField = 'uuid';
 
   int _getLineNumber(Token token, ResolvedUnitResult analysisResult) {
-    return analysisResult.unit.lineInfo!.getLocation(token.offset).lineNumber;
+    return analysisResult.unit.lineInfo.getLocation(token.offset).lineNumber;
   }
 
   String _generateReplacement(InstanceCreationExpression node, ResolvedUnitResult analysisResult) {
@@ -141,10 +141,10 @@ class ClickableWidgetIdMissing extends Rule {
               errorType: AnalysisErrorType.HINT,
               offset: node.offset,
               length: node.length,
-              line: analysisResult.unit.lineInfo!.getLocation(node.offset).lineNumber,
-              column: analysisResult.unit.lineInfo!.getLocation(node.offset).columnNumber,
-              endLine: analysisResult.unit.lineInfo!.getLocation(node.end).lineNumber,
-              endColumn: analysisResult.unit.lineInfo!.getLocation(node.end).columnNumber,
+              line: analysisResult.unit.lineInfo.getLocation(node.offset).lineNumber,
+              column: analysisResult.unit.lineInfo.getLocation(node.offset).columnNumber,
+              endLine: analysisResult.unit.lineInfo.getLocation(node.end).lineNumber,
+              endColumn: analysisResult.unit.lineInfo.getLocation(node.end).columnNumber,
               message: generateMessage(node),
               code: code,
               comment: comment,
@@ -222,7 +222,7 @@ class _ParameterVisitor extends GeneralizingAstVisitor<void> {
       _isTargetAnnotation = true;
     }
 
-    int lineNumber = analysisResult!.unit.lineInfo!.getLocation(node.offset).lineNumber;
+    int lineNumber = analysisResult!.unit.lineInfo.getLocation(node.offset).lineNumber;
     final ignores = Suppression(analysisResult!.content, analysisResult!.lineInfo);
 
     /// 判断是否忽略

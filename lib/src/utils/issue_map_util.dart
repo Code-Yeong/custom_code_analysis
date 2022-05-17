@@ -39,7 +39,7 @@ List<AnalysisErrorFixes> codeIssueToAnalysisErrorFixes(List<Issue> issueList, Re
                   edits: [
                     SourceFileEdit(
                       analysisResult.libraryElement.source.fullName,
-                      analysisResult.libraryElement.source.modificationStamp,
+                      analysisResult.libraryElement.source.contents.modificationTime,
                       edits: [
                         SourceEdit(
                           issue.offset!,
