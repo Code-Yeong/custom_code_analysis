@@ -6,7 +6,7 @@ environment:
 
 dependencies:
 #   线上插件用这个依赖
-  custom_code_analysis: 1.2.5
+  custom_code_analysis: 1.2.7
 
 #   调试本地插件用这个依赖（仅限本地测试时打开，发布时关闭）
 #  custom_code_analysis:
